@@ -1,0 +1,63 @@
+--- python-zipp.spec
++++ saltbundlepy-zipp.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-zipp
++# spec file for package saltbundlepy-zipp
+ #
+-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,7 +16,13 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
+ %global flavor @BUILD_FLAVOR@%{nil}
+ %if "%{flavor}" == "test"
+ %define psuffix -test
+@@ -25,7 +31,8 @@
+ %define psuffix %{nil}
+ %bcond_with test
+ %endif
+-Name:           python-zipp%{psuffix}
++
++Name:           saltbundlepy-zipp%{psuffix}
+ Version:        0.6.0
+ Release:        0
+ Summary:        Pathlib-compatible object wrapper for zip files
+@@ -33,18 +40,17 @@
+ Group:          Development/Languages/Python
+ URL:            https://github.com/jaraco/zipp
+ Source:         https://files.pythonhosted.org/packages/source/z/zipp/zipp-%{version}.tar.gz
+-BuildRequires:  %{python_module setuptools_scm >= 1.15.0}
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools-scm >= 1.15.0}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-contextlib2
+-BuildRequires:  python-rpm-macros
+-BuildRequires:  python-unittest2
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildArch:      noarch
+ %if %{with test}
+-BuildRequires:  %{python_module more-itertools}
+-BuildRequires:  %{python_module pytest >= 3.5}
++BuildRequires:  %{saltbundlepy_module more-itertools}
++BuildRequires:  %{saltbundlepy_module pytest >= 3.5}
+ %endif
+-Requires:       python-more-itertools
++Requires:       saltbundlepy-more-itertools
+ %python_subpackages
+ 
+ %description

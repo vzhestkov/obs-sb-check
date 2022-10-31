@@ -1,0 +1,100 @@
+--- python310-setuptools.changes
++++ saltbundlepy-setuptools.changes
+@@ -1,79 +1,24 @@
+ -------------------------------------------------------------------
+-Mon Mar 14 14:31:16 UTC 2022 - Matej Cepl <mcepl@suse.com>
+-
+-- Require explicitly python310-xml
+-
+--------------------------------------------------------------------
+-Wed Jan 26 23:51:24 UTC 2022 - Matej Cepl <mcepl@suse.com>
+-
+-- Convert python-setuptools into standalone 310-only package for
+-  SLE-15-SP4 (jsc#SLE-20253).
+-
+--------------------------------------------------------------------
+-Thu Dec 23 11:42:19 UTC 2021 - Dominique Leuenberger <dimstar@opensuse.org>
+-
+-- Remove unzip BuildRequires: the tarball is proper gz compressed,
+-  no zip files to decompress here.
+-
+--------------------------------------------------------------------
+-Thu Jul 22 01:33:08 UTC 2021 - Arun Persaud <arun@gmx.de>
+-
+-- update to version 57.4.0:
+-  * Changes
+-    + #2722: Added support for SETUPTOOLS_EXT_SUFFIX environment
+-       variable to override the suffix normally detected from the
+-       sysconfig module.
+-
+-- changes from version 57.3.0:
+-  * Changes
+-    + #2465: Documentation is now published using the Furo theme.
+-
+-- changes from version 57.2.0:
+-  * Changes
+-    + #2724: Added detection of Windows ARM64 build environments using
+-       the VSCMD_ARG_TGT_ARCH environment variable.
+-
+-- changes from version 57.1.0:
+-  * Changes
+-    + #2692: Globs are now sorted in 'license_files' restoring
+-       reproducibility by eliminating variance from disk order.
+-    + #2714: Update to distutils at pypa/distutils@e2627b7.
+-    + #2715: Removed reliance on deprecated ssl.match_hostname by
+-       removing the ssl support. Now any index operations rely on the
+-       native SSL implementation.
+-  * Documentation changes
+-    + #2604: Revamped the backward/cross tool compatibility section to
+-       remove some confusion. Add some examples and the version since
+-       when entry_points are supported in declarative
+-       configuration. Tried to make the reading flow a bit leaner,
+-       gather some informations that were a bit dispersed.
+-
+--------------------------------------------------------------------
+-Mon Jul  5 09:22:44 UTC 2021 - Antonio Larrosa <alarrosa@suse.com>
+-
+-- Add patch to remove a dependency cycle between
+-  python-more-itertools and python-setuptools (which requires the
+-  former just for one simple function):
++Mon Apr  4 12:04:52 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Update to version 57.4.0 as Python 3.10 support is required
++- Strictly require Python 3.10 with saltbundlepy requrement
++
++- Added:
++  * setuptools-57.4.0.tar.gz
++  * remove_mock.patch
+   * remove-more-itertools-dependency-cycle.patch
+ 
+--------------------------------------------------------------------
+-Fri Jun 25 12:46:26 UTC 2021 - Ben Greiner <code@bnavigator.de>
+-
+-- Update to 57.0.0
+-  * big changelog since 44.1, see CHANGES.rst.
+-- No python2 support anymore.
+-- Refresh sort-for-reproducibility.patch and remove_mock.patch.
+-- Drop importlib.patch, fixed upstream.
+-- Remove testdata.tar.gz, packaged upstream.
+-- Update requirements.
+-  * New Ring-1 dep: python-jaraco.path <-- python-singledispatch
+-
+--------------------------------------------------------------------
+-Thu Jun 17 17:03:46 UTC 2021 - Ben Greiner <code@bnavigator.de>
+-
+-- Add python dist provides for setuptools, pkg_resources and
+-  easy_install: work around boo#1186870
+-- Dont create a package for -test flavor
++- Removed:
++  * setuptools-44.1.1.tar.gz
++  * importlib.patch
++
++-------------------------------------------------------------------
++Tue Apr 27 18:12:12 UTC 2021 - Matej Cepl <mcepl@suse.com>
++
++- Switch to vendored dependencies and switch off tests to have it as
++  a simple python39 version of setuptools for SLE-15
++  (jsc#SLE-17532, jsc#SLE-17957).
+ 
+ -------------------------------------------------------------------
+ Fri Jan 22 19:05:02 UTC 2021 - Matej Cepl <mcepl@suse.com>

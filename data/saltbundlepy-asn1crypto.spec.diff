@@ -1,0 +1,50 @@
+--- python-asn1crypto.spec
++++ saltbundlepy-asn1crypto.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-asn1crypto
++# spec file for package saltbundlepy-asn1crypto
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,23 +12,30 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
+ %bcond_without test
+-Name:           python-asn1crypto
++Name:           saltbundlepy-asn1crypto
+ Version:        0.24.0
+ Release:        0
+ Summary:        ASN.1 parser and serializer for Python
+ License:        MIT
+ Group:          Development/Languages/Python
+-Url:            https://github.com/wbond/asn1crypto
++URL:            https://github.com/wbond/asn1crypto
+ Source:         https://files.pythonhosted.org/packages/source/a/asn1crypto/asn1crypto-%{version}.tar.gz
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  python-rpm-macros
++BuildRequires:  %{saltbundlepy_module devel > 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-base
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+ BuildArch:      noarch
+ 

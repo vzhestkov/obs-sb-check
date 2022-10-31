@@ -1,0 +1,11 @@
+--- python-chardet.changes
++++ saltbundlepy-chardet.changes
+@@ -1,3 +1,8 @@
++-------------------------------------------------------------------
++Mon Apr  4 12:29:39 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++
+ -------------------------------------------------------------------
+ Wed Sep 20 21:47:30 UTC 2017 - dmueller@suse.com
+ 

@@ -1,0 +1,66 @@
+--- python-setuptools_scm.spec
++++ saltbundlepy-setuptools-scm.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-setuptools_scm
++# spec file for package saltbundlepy-setuptools-scm
+ #
+-# Copyright (c) 2020 SUSE LLC
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,7 +16,13 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
+ %global flavor @BUILD_FLAVOR@%{nil}
+ %if "%{flavor}" == "test"
+ %define psuffix -test
+@@ -25,7 +31,8 @@
+ %define psuffix %{nil}
+ %bcond_with test
+ %endif
+-Name:           python-setuptools_scm%{psuffix}
++
++Name:           saltbundlepy-setuptools-scm%{psuffix}
+ Version:        3.5.0
+ Release:        0
+ Summary:        Python setuptools handler for SCM tags
+@@ -33,19 +40,19 @@
+ URL:            https://github.com/pypa/setuptools_scm
+ Source:         https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-%{version}.tar.gz
+ Patch0:         add-rpmfail-pytest-markers.patch
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-Requires:       python-setuptools
+-Suggests:       python-toml
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-setuptools
+ BuildArch:      noarch
+ %if %{with test}
+ # Testing requirements
+-BuildRequires:  %{python_module pip}
+-BuildRequires:  %{python_module pytest}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  %{python_module setuptools_scm = %{version}}
+-BuildRequires:  %{python_module toml}
++BuildRequires:  %{saltbundlepy_module pip}
++BuildRequires:  %{saltbundlepy_module pytest}
++BuildRequires:  %{saltbundlepy_module setuptools_scm = %{version}}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  %{saltbundlepy_module toml}
+ BuildRequires:  git-core
+ BuildRequires:  mercurial
+ %endif

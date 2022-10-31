@@ -1,0 +1,93 @@
+--- python-pyOpenSSL.spec
++++ saltbundlepy-pyopenssl.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-pyOpenSSL
++# spec file for package saltbundlepy-pyopenssl
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,38 +16,41 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%define oldpython python
+-Name:           python-pyOpenSSL
+-Version:        20.0.1
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-pyopenssl
++Version:        19.0.0
+ Release:        0
+ Summary:        Python wrapper module around the OpenSSL library
+ License:        Apache-2.0
++Group:          Development/Languages/Python
+ URL:            https://github.com/pyca/pyopenssl
+ Source:         https://files.pythonhosted.org/packages/source/p/pyOpenSSL/pyOpenSSL-%{version}.tar.gz
+-# PATCH-FIX-UPSTREAM skip-networked-test.patch gh#pyca/pyopenssl#68 mcepl@suse.com
+-# Mark tests requiring network access
+-Patch0:         skip-networked-test.patch
+-BuildRequires:  %{python_module cffi}
+-BuildRequires:  %{python_module cryptography >= 2.8}
+-BuildRequires:  %{python_module flaky}
+-BuildRequires:  %{python_module pretend}
+-BuildRequires:  %{python_module pytest >= 3.0.1}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  %{python_module six}
++Patch1:         skip-networked-test.patch
++Patch2:         fix-compilation-2020.patch
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module cffi}
++BuildRequires:  %{saltbundlepy_module cryptography >= 2.3.0}
++%if %{with tests}
++BuildRequires:  %{saltbundlepy_module flaky}
++BuildRequires:  %{saltbundlepy_module pretend}
++BuildRequires:  %{saltbundlepy_module pytest >= 3.0.1}
++%endif
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  %{saltbundlepy_module six}
+ BuildRequires:  ca-certificates-mozilla
+ BuildRequires:  fdupes
+ BuildRequires:  openssl
+-BuildRequires:  python-rpm-macros
+-Requires:       python-cffi
+-Requires:       python-cryptography >= 2.8
+-Requires:       python-six >= 1.5.2
+-Provides:       pyOpenSSL = %{version}
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-cffi
++Requires:       saltbundlepy-cryptography >= 2.3.0
++Requires:       saltbundlepy-six >= 1.5.2
+ BuildArch:      noarch
+-%ifpython2
+-Obsoletes:      %{oldpython}-openssl < %{version}
+-Provides:       %{oldpython}-openssl = %{version}
+-%endif
+ %python_subpackages
+ 
+ %description
+@@ -70,13 +73,13 @@
+ %python_install
+ %python_expand %fdupes %{buildroot}%{$python_sitelib}
+ 
++%if %{with tests}
+ %check
+-SKIPPED_TESTS="network"
+-%if %{__isa_bits} == 32
+-SKIPPED_TESTS="(network or test_verify_with_time)"
++export LC_ALL=en_US.UTF-8
++%{python_expand export PYTHONPATH=%{buildroot}%{$python_sitelib}
++py.test-%{$python_bin_suffix} -m "not network"
++}
+ %endif
+-export LC_ALL=en_US.UTF-8
+-%pytest -k "not $SKIPPED_TESTS"
+ 
+ %files %{python_files}
+ %license LICENSE

@@ -1,0 +1,87 @@
+--- python-chardet.spec
++++ saltbundlepy-chardet.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-chardet
++# spec file for package saltbundlepy-chardet
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,31 +12,42 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-chardet
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++%bcond_with     tests
++
++Name:           saltbundlepy-chardet
+ Version:        3.0.4
+ Release:        0
+ Summary:        Universal encoding detector
+-License:        LGPL-2.1+
++License:        LGPL-2.1-or-later
+ Group:          Development/Languages/Python
+-Url:            https://github.com/chardet/chardet
++URL:            https://github.com/chardet/chardet
+ Source0:        https://files.pythonhosted.org/packages/source/c/chardet/chardet-%{version}.tar.gz
+-Source1:        python-chardet-rpmlintrc
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module hypothesis}
+-BuildRequires:  %{python_module pytest-runner}
+-BuildRequires:  %{python_module setuptools}
++Source1:        saltbundlepy-chardet-rpmlintrc
++Patch0:         prevent_fake_link.patch
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
++%if %{with tests}
++BuildRequires:  %{saltbundlepy_module hypothesis}
++BuildRequires:  %{saltbundlepy_module pytest-runner}
++%endif
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+ BuildArch:      noarch
+ Requires(post): update-alternatives
+-Requires(postun): update-alternatives
+-
++Requires(postun):update-alternatives
++Requires:       saltbundlepy-base
+ %python_subpackages
+ 
+ %description
+@@ -70,6 +81,7 @@
+ 
+ %prep
+ %setup -q -n chardet-%{version}
++%autopatch -p1
+ 
+ %build
+ %python_build
+@@ -83,8 +95,10 @@
+ 
+ %prepare_alternative chardetect
+ 
++%if %{with tests}
+ %check
+ %python_expand PYTHONPATH=%{buildroot}%{$python_sitelib} py.test-%{$python_version} test.py
++%endif
+ 
+ %post
+ %python_install_alternative chardetect

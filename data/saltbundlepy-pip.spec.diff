@@ -1,0 +1,146 @@
+--- python310-pip.spec
++++ saltbundlepy-pip.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-pip
+-#
+-# Copyright (c) 2021 SUSE LLC
++# spec file for package saltbundlepy-pip
++#
++# Copyright (c) 2022 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,14 +16,10 @@
+ #
+ 
+ 
+-%if 0%{?suse_version} > 1500
+-%bcond_without libalternatives
+-%else
+-%bcond_with libalternatives
+-%endif
+-
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%define pythons python310
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++
+ %global flavor @BUILD_FLAVOR@%{nil}
+ %if "%{flavor}" == "test"
+ %define psuffix -test
+@@ -39,7 +35,7 @@
+ %bcond_with wheel
+ %endif
+ %endif
+-Name:           python310-pip%{psuffix}
++Name:           saltbundlepy-pip%{psuffix}
+ Version:        20.2.4
+ Release:        0
+ Summary:        A Python package management system
+@@ -47,51 +43,45 @@
+ URL:            http://www.pip-installer.org
+ # The PyPI archive lacks the tests
+ Source:         https://github.com/pypa/pip/archive/%{version}.tar.gz#/pip-%{version}-gh.tar.gz
+-# PATCH-FIX-OPENSUSE pip-shipped-requests-cabundle.patch -- adapted patch from python-certifi package
+-Patch0:         pip-shipped-requests-cabundle.patch
++# PATCH-FIX-OPENSUSE return-CA-bundle-for-distro.patch -- adapted patch from saltbundlepy-certifi package
++Patch0:         return-CA-bundle-for-distro.patch
+ # PATCH-FIX-UPSTREAM remove_mock.patch gh#pypa/pip#9266 mcepl@suse.com
+ # remove dependency on the external module mock
+ Patch1:         remove_mock.patch
+-BuildRequires:  python310-base
+-BuildRequires:  python310-setuptools >= 40.8.0
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools >= 40.8.0}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros >= 20210929
++BuildRequires:  saltbundlepy-rpm-macros
+ Requires:       ca-certificates
+ Requires:       coreutils
+-Requires:       python310-setuptools
+-Requires:       python310-xml
+-%if %{with libalternatives}
+-Requires:       alts
+-BuildRequires:  alts
+-%else
++Requires:       saltbundlepy-setuptools
++Requires:       saltbundlepy-xml
+ Requires(post): update-alternatives
+ Requires(postun): update-alternatives
+-%endif
+-Recommends:     ca-certificates-mozilla
+ BuildArch:      noarch
+ %if %{with test}
+ # Test requirements:
+-BuildRequires:  %{python_module PyYAML}
+-BuildRequires:  %{python_module Werkzeug}
+-BuildRequires:  %{python_module cryptography}
+-BuildRequires:  %{python_module csv23}
+-BuildRequires:  %{python_module docutils}
+-BuildRequires:  %{python_module freezegun}
+-BuildRequires:  %{python_module pretend}
+-BuildRequires:  %{python_module pytest}
+-BuildRequires:  %{python_module scripttest}
+-BuildRequires:  %{python_module setuptools-wheel}
+-BuildRequires:  %{python_module virtualenv >= 1.10}
+-BuildRequires:  %{python_module wheel}
++BuildRequires:  %{saltbundlepy_module PyYAML}
++BuildRequires:  %{saltbundlepy_module Werkzeug}
++BuildRequires:  %{saltbundlepy_module cryptography}
++BuildRequires:  %{saltbundlepy_module csv23}
++BuildRequires:  %{saltbundlepy_module docutils}
++BuildRequires:  %{saltbundlepy_module freezegun}
++BuildRequires:  %{saltbundlepy_module pretend}
++BuildRequires:  %{saltbundlepy_module pytest}
++BuildRequires:  %{saltbundlepy_module scripttest}
++BuildRequires:  %{saltbundlepy_module setuptools-wheel}
++BuildRequires:  %{saltbundlepy_module virtualenv >= 1.10}
++BuildRequires:  %{saltbundlepy_module wheel}
+ %if 0%{?suse_version} <= 1500
+-BuildRequires:  %{python_module mock}
++BuildRequires:  %{saltbundlepy_module mock}
+ %endif
+ BuildRequires:  ca-certificates
+ BuildRequires:  git
+ BuildRequires:  subversion
+ %endif
+ %if %{with wheel}
+-BuildRequires:  %{python_module wheel}
++BuildRequires:  %{saltbundlepy_module wheel}
+ %endif
+ %python_subpackages
+ 
+@@ -104,6 +94,21 @@
+ # Unbundling is not advised by upstream. See src/pip/_vendor/README.rst
+ # Exception: Use our own cabundle. Adapted patch from python-certifi package
+ %autosetup -p1 -n pip-%{version}
++
++%if 0%{?suse_version}
++export CA_BUNDLE_PATH=/etc/ssl/ca-bundle.pem
++%endif
++%if 0%{?rhel_version} || 0%{?centos_version} || 0%{?fedora_version} || 0%{?almalinux_version} || 0%{?rocky_version}
++export CA_BUNDLE_PATH=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
++%endif
++%if 0%{?debian_version} || 0%{?ubuntu_version}
++export CA_BUNDLE_PATH=/etc/ssl/certs/ca-certificates.crt
++%endif
++if [ -z "${CA_BUNDLE_PATH}" ]; then
++    echo "Error: Unable to define CA bundle path!"
++    exit 1
++fi
++sed -i "s#++CA_BUNDLE_PATH++#${CA_BUNDLE_PATH}#" src/pip/_vendor/certifi/core.py
+ 
+ rm src/pip/_vendor/certifi/cacert.pem
+ 
+@@ -167,9 +172,7 @@
+ # keep the alternative groups separate. Users could decide to let pip and pip3 point to
+ # different flavors
+ %python_install_alternative pip
+-%if "%python_flavor" != "python2"
+ %python_install_alternative pip3
+-%endif
+ 
+ %postun
+ %python_uninstall_alternative pip

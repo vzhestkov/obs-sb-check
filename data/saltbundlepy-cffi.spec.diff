@@ -1,0 +1,79 @@
+--- python-cffi.spec
++++ saltbundlepy-cffi.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-cffi
++# spec file for package saltbundlepy-cffi
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,25 +16,32 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-cffi
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-cffi
+ Version:        1.15.0
+ Release:        0
+ Summary:        Foreign Function Interface for Python calling C code
+ License:        MIT
+-URL:            https://cffi.readthedocs.org
++Group:          Development/Languages/Python
++URL:            http://cffi.readthedocs.org
+ Source0:        https://files.pythonhosted.org/packages/source/c/cffi/cffi-%{version}.tar.gz
+-Source1:        python-cffi-rpmlintrc
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module pycparser}
+-BuildRequires:  %{python_module pytest}
+-BuildRequires:  %{python_module setuptools}
++Source1:        saltbundlepy-cffi-rpmlintrc
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module pycparser}
++BuildRequires:  %{saltbundlepy_module pytest}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+ BuildRequires:  gcc-c++
+ BuildRequires:  pkgconfig
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildRequires:  pkgconfig(libffi)
+-Requires:       python-pycparser
++Requires:       saltbundlepy-pycparser
+ %python_subpackages
+ 
+ %description
+@@ -43,6 +50,7 @@
+ 
+ %prep
+ %setup -q -n cffi-%{version}
++%autopatch -p1
+ 
+ %build
+ export CFLAGS="%{optflags}"
+@@ -52,8 +60,17 @@
+ %python_install
+ %python_expand %fdupes %{buildroot}%{$python_sitearch}
+ 
++%ifnarch i386
+ %check
+-%pytest_arch -W ignore::UserWarning c/ testing/
++%if 0%{?sle_version} == 120000 && "%{_arch}" == "aarch64"
++%define pytest_extra_opts -k 'not test_struct_by_value'
++%else
++%define pytest_extra_opts %{nil}
++%endif
++%{python_expand export PYTHONPATH=%{buildroot}%{$python_sitearch}
++py.test-%$python_bin_suffix -v -W ignore::UserWarning %{pytest_extra_opts} c/ testing/
++}
++%endif
+ 
+ %files %{python_files}
+ %license LICENSE

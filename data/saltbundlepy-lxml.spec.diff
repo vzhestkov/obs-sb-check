@@ -1,0 +1,105 @@
+--- python-lxml.spec
++++ saltbundlepy-lxml.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-lxml
++# spec file for package saltbundlepy-lxml
+ #
+-# Copyright (c) 2022 SUSE LLC
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,24 +16,37 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-lxml
+-Version:        4.9.1
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-lxml
++Version:        4.7.1
+ Release:        0
+ Summary:        Pythonic XML processing library
+ License:        BSD-3-Clause AND GPL-2.0-or-later
+ Group:          Development/Languages/Python
+ URL:            https://lxml.de/
+ Source0:        https://files.pythonhosted.org/packages/source/l/lxml/lxml-%{version}.tar.gz
+-Source1:        https://lxml.de/lxmldoc-4.5.2.pdf
+-BuildRequires:  %{python_module Cython >= 0.29.7}
+-BuildRequires:  %{python_module cssselect >= 0.9.1}
+-BuildRequires:  %{python_module setuptools >= 18.0.1}
++BuildRequires:  %{saltbundlepy_module cssselect >= 0.9.1}
++BuildRequires:  %{saltbundlepy_module cython >= 0.29.7}
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools >= 18.0.1}
+ BuildRequires:  fdupes
+-BuildRequires:  libxml2-devel >= 2.9.5
++%if "%_vendor" == "debbuild"
++BuildRequires:  libxml2-dev >= 2.7.0
++BuildRequires:  libxslt1-dev >= 1.1.23
++BuildRequires:  zlib1g-dev
++%else
++BuildRequires:  libxml2-devel >= 2.7.0
+ BuildRequires:  libxslt-devel >= 1.1.23
+-BuildRequires:  python-rpm-macros
+-Requires:       python-cssselect >= 0.9.1
++BuildRequires:  pkgconfig(zlib)
++%endif
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-cssselect >= 0.9.1
+ %python_subpackages
+ 
+ %description
+@@ -45,6 +58,7 @@
+ %package -n %{name}-doc
+ Summary:        Documentation for python-lxml, an XML processing library
+ Group:          Documentation/Other
++Provides:       %{python_module doc = %{version}}
+ BuildArch:      noarch
+ 
+ %description -n %{name}-doc
+@@ -58,7 +72,6 @@
+ %package devel
+ Summary:        Development files for python-lxml
+ Group:          Development/Libraries/Python
+-BuildRequires:  %{python_module base}
+ Requires:       %{name} = %{version}
+ 
+ %description devel
+@@ -71,7 +84,6 @@
+ 
+ %prep
+ %setup -q -n lxml-%{version}
+-cp %{SOURCE1} .
+ 
+ # remove generated files
+ find -name '*.c' -delete -print
+@@ -87,12 +99,7 @@
+ export CFLAGS="%{optflags}"
+ export LANG=en_US.UTF-8
+ export PYTHONUNBUFFERED=x
+-%if 0%{?have_python2}
+-%make_build test
+-%endif
+-%if 0%{?have_python3}
+-%make_build test3
+-%endif
++PYTHON3=%{__saltbundlepy} make %{?_smp_mflags} test3
+ 
+ %install
+ %python_install
+@@ -114,6 +121,5 @@
+ %files -n %{name}-doc
+ %license LICENSES.txt
+ %doc doc/html
+-%doc lxmldoc-*.pdf
+ 
+ %changelog

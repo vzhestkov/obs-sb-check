@@ -1,0 +1,11 @@
+--- python-importlib-metadata.changes
++++ saltbundlepy-importlib-metadata.changes
+@@ -1,3 +1,8 @@
++-------------------------------------------------------------------
++Mon Apr  4 12:38:44 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++
+ -------------------------------------------------------------------
+ Sun Mar  8 04:09:30 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
+ 

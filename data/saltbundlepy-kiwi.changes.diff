@@ -1,0 +1,178 @@
+--- python-kiwi.changes
++++ saltbundlepy-kiwi.changes
+@@ -1,171 +1,11 @@
+ -------------------------------------------------------------------
+-Tue Mar 29 13:01:59 CEST 2022 - dcassany@suse.com
++Mon Apr  4 12:39:56 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
+ 
+-- Bump version: 9.24.16 → 9.24.17
+-  
+-  This version includes fixes for:
+-  
+-  * Fix booting GRUB submenu entries with hybrid images (linux/linuxefi)
+-    
+-    Variables assigned with "set" are not visible in submenus for some reason.
+-    Export $linux and $initrd, so that they also work in submenu entries.
+-    
+-    Fixes bsc#1192523
+-    
+--------------------------------------------------------------------
+-Wed Mar  2 15:24:47 CET 2022 - dcassany@suse.com
+-    
+-- Stick to pytest v6.x.y
+-  
+-  Signed-off-by: David Cassany <dcassany@suse.com>
+-  
+--------------------------------------------------------------------
+-Wed Mar  2 13:09:21 CET 2022 - fvogt@suse.de
+-  
+-- Don't exit the script on deprecated function use (bsc#1196644)
+-  
+-  The "exit 0" there stops processing of the calling script with a success exit
+-  code, which leads to incomplete and broken images.
+-  
+--------------------------------------------------------------------
+-Mon Jan 31 11:05:31 CET 2022 - dcassany@suse.com
+-  
+-- Ensure backward compatibility on deprecated methods
+-  
+-  This commit ensures backward compatibility for deprecated
+-  config bash script utilities.
+-  
+-  Fixes bsc#1195229
+-  
+-  Signed-off-by: David Cassany <dcassany@suse.com>
+-  
+--------------------------------------------------------------------
+-Mon Jan 31 11:04:56 CET 2022 - dcassany@suse.com
+-  
+-- Bump version: 9.24.15 → 9.24.16
+-  
+-  This version upgrade includes several fixes:
+-  
+-  * Fixed regression in compression detection
+-    
+-    The change from 282529de8f612dee32d54ee868c2365dcd829220
+-    Introduced a bad regression. The assumption was made that the
+-    xz tool could be used to detect if a file is compressed or not.
+-    However, this requires the file to be locally present. In the
+-    scope of the method call is_compressed() and within a remote
+-    deployment e.g PXE this is not the case. Therefore the former
+-    way to "detect" the compression according to the .xz postfix
+-    of the source filename was restored. In addition the function
+-    name was changed to is_xz_compressed() because that's what the
+-    method can do and not more. This Fixes #2015
+-    
+-    Fixes a regression in the scope of bsc#1192975 (#c16)
+-    
+-  * index.rst: Change title (bsc#1189294#c2)
+-    
+-  * 'KIWI NG 9: KIWI NG Documentation' -> 'Building Linux System Appliances with KIWI Next Generation (KIWI NG <VERSION>)
+-  * suggested in bsc#1189294#c2 for more clarity
+-  * change has been discussed with and approved by main author (Marcus S.)
+-    
+-  * Care for different snapper template locations
+-    
+-    snapper recently changed their config template location
+-    from etc/ to usr/. This commit handles the two locations
+-    and Fixes bsc#1192940
+-    
+-  * Do not force dracut into a compression setting
+-    
+-    So far we called dracut with --xz which forces the initrd
+-    to be xz compressed. There are other compression formats
+-    used by the distributions and they might differe from xz.
+-    The selection for a compression tool is done by a dist
+-    configuration in dracut.conf.d which is provided by the
+-    distributions as they see fit. For us this means not
+-    forcing dracut into a specific compression setting allows
+-    to make use of the distro provided setting and also
+-    allows to change/override this setting by an overlay
+-    file. This Fixes bsc#1192975
+-    
+--------------------------------------------------------------------
+-Mon Oct 25 12:23:24 CEST 2021 - ms@suse.de
+-    
+-- Bump version: 9.23.20 → 9.24.2
+-  
+-  This version upgrade includes several fixes:
+-  
+-  * Fixed secure boot fallback setup
+-    
+-    Make sure MokManager gets copied. The name and location of
+-    the mok manager is distribution specific in the same way as
+-    the shim loader. Thus we need to apply a similar concept
+-    for looking it up. This Fixes bsc#1187515
+-    
+-  * Allow creation of LUKS system with empty key
+-    
+-    To support cloud platforms better we should allow the
+-    creation of an initial(insecure) LUKS encrypted image
+-    with an empty passphrase/keyfile. This Fixes
+-    bsc#1187461 and bsc#1187460
+-    
+-  * Delete obsolete ddb.adapterType patching
+-    
+-    When building a vmdk image with pvscsi as adapter type, kiwi
+-    implicitly changed the adapter_type from pvscsi to lsilogic
+-    because qemu only knows lsilogic. At the end kiwi patched
+-    the adapter type in the descriptor of the vmdk header back
+-    to pvscsi. That patching seems to be wrong according to
+-    information from users and VMware support. This commit
+-    deletes the descriptor patching and only leaves the pvscsi
+-    setting in the guest configuration(vmx).
+-    This Fixes bsc#1180539 and Fixes #1847
+-    
+-  * Make dracut version check more robust
+-    
+-    The check_dracut_module_versions_compatible_to_kiwi() runtime
+-    check calls the package manager from the host and reads the
+-    package database from the image root. Doing this requires
+-    the package database in the image to be compatible with the
+-    package manager on the host. However this cannot be guarenteed
+-    and it is more robust to chroot into the image root and call
+-    the package manager from there. However, this change also comes
+-    with the cost that it's required to have a package manager
+-    available in the image root tree. Therefore along with the
+-    chroot based call, eventual exceptions from the call are now
+-    catched and leads to a debug message in the log file but will
+-    not lead the runtime check to fail. I consider the cases
+-    without a package database inside of the image to be less
+-    critical than the incompatibility issue between the host
+-    tooling and the package database in the image.
+-    This Fixes bsc#1185937
+-    
+-  * Fixed setup of repository architecture
+-    
+-    Unfortunately the architecture reported by uname is not
+-    necessarily the same name as used in the repository metadata.
+-    Therefore it was not a good idea to set the architecture
+-    and manage the name via a mapping table. It also has turned
+-    out that repo arch names are distro specific which causes
+-    more complexity on an eventual mapping table. In the end
+-    this commit changes the way how the repository architecture
+-    is setup in a way that we only set the architecture if
+-    a name was explicitly specified such that the user keeps
+-    full control over it without any mapping magic included
+-    This Fixes bsc#1185287
+-    
+-  * Do not apply default subcommand for derivate containers
+-    
+-    This commit does not apply the default subcommand for derivate
+-    containers. Fixes bsc#1184823
+-    
+-  * Added openssl to the core requires
+-    
+-    openssl is used in kiwi to construct a password hash
+-    if the plaintext password feature for user settings
+-    is used. This Fixes bsc#1184128
+-    
++- Strictly require Python 3.10 with saltbundlepy requrement
++
+ -------------------------------------------------------------------
+ Fri Apr 16 15:50:09 CEST 2021 - dcassany@suse.com
+-    
++
+ - Fix appx manifest for WSL containers
+   
+   This patch is two fold

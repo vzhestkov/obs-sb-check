@@ -1,0 +1,261 @@
+--- python-pytest.changes
++++ saltbundlepy-pytest.changes
+@@ -1,207 +1,57 @@
+ -------------------------------------------------------------------
+-Mon Aug  3 21:04:38 UTC 2020 - Matej Cepl <mcepl@suse.com>
+-
+-- nose is actually not required: the test suite happily skips over tests
+-  which require it.
+-
+--------------------------------------------------------------------
+-Tue Jun  9 07:43:57 UTC 2020 - Steve Kowalik <steven.kowalik@suse.com>
+-
+-- Rebase and re-add tidy-up-embeddedfile.patch, it was only partially merged
+-  upstream.
+-
+--------------------------------------------------------------------
+-Fri Jun  5 09:03:56 UTC 2020 - Ondřej Súkup <mimi.vx@gmail.com>
+-
+-- update to 5.4.3
+- * Paths appearing in error messages are now correct in case the current working
+-     directory has changed since the start of the session.
+- * Support deleting paths longer than 260 characters on windows created inside tmpdir.
+- * Prevent pytest from printing ConftestImportFailure traceback to stdout.
+- * Prevent hiding the underlying exception when ConfTestImportFailure is raised.
+- * Fix regression where running with --pdb would call the tearDown methods
+-     of unittest.TestCase subclasses for skipped tests.
+-
+--------------------------------------------------------------------
+-Tue May 12 08:49:45 UTC 2020 - Ondřej Súkup <mimi.vx@gmail.com>
+-
+-- Update to 5.4.2
+- * Fix crash with captured output when using the capsysbinary fixture.
+- * Ensure a unittest.IsolatedAsyncioTestCase is actually awaited.
+- * Fix TerminalRepr instances to be hashable again.
+- * Fix regression where functions registered with TestCase.addCleanup
+-    were not being called on test failures.
+- * Allow users to still set the deprecated TerminalReporter.writer attribute.
+- * Revert “tmpdir: clean up indirection via config for factories
+- * Fixed regression: asyncbase.TestCase tests are executed correctly again
+- * Fix File.from_constructor so it forwards extra keyword arguments to the constructor.
+- * Classes with broken __getattribute__ methods are displayed correctly during failures.
+- * Fix _is_setup_py for files encoded differently than locale.
+-
+--------------------------------------------------------------------
+-Mon Apr 27 10:43:32 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Update to 5.4.1:
+-  * #6909: Revert the change introduced by #6330, which required all
+-    arguments to @pytest.mark.parametrize to be explicitly defined
+-    in the function signature.
+-  * #6910: Fix crash when plugins return an unknown stats while using
+-    the --reportlog option.
+-  * #6316: Matching of -k EXPRESSION to test names is now case-insensitive.
+-  * #6443: Plugins specified with -p are now loaded after internal plugins
+-  * #6637: Removed the long-deprecated pytest_itemstart hook.
+-  * #6673: Reversed / fix meaning of “+/-” in error diffs. “-” means that
+-    sth. expected is missing in the result and “+” means that there are
+-    unexpected extras in the result.
+-- Remove merged patch tidy-up-embeddedfile.patch
+-
+--------------------------------------------------------------------
+-Wed Mar 18 07:45:23 UTC 2020 - Steve Kowalik <steven.kowalik@suse.com>
+-
+-- Add patch tidy-up-embeddedfile.patch based on an upstream PR. Can
+-  be dropped when updating.
+-
+--------------------------------------------------------------------
+-Wed Feb 19 09:47:59 UTC 2020 - Ondřej Súkup <mimi.vx@gmail.com>
+-
+-- Update to 5.3.5
+- * Captured output during teardown is shown with -rP
+- * Fix a pytest-xdist crash when dealing with exceptions raised
+-   in subprocesses created by the multiprocessing module.
+- * FixtureDef objects now properly register their finalizers
+-   with autouse and parameterized fixtures that execute before
+-   them in the fixture stack so they are torn down at the right times,
+-   and in the right order.
+- * Fix parsing of outcomes containing multiple errors with testdir results
+-
+--------------------------------------------------------------------
+-Tue Jan 14 12:32:50 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Fix typo importlib_metadata -> importlib-metadata
+-
+--------------------------------------------------------------------
+-Mon Jan  6 13:23:00 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Update to 5.3.2:
+-  * junitxml: Logs for failed test are now passed to junit report in
+-    case the test fails during call phase.
+-  * supporting files in the .pytest_cache directory are kept with
+-    --cache-clear, which only clears cached values now.
+-  * Fix assertion rewriting for egg-based distributions and editable
+-    installs (pip install --editable).
+-  * Improve check for misspelling of pytest.mark.parametrize.
+-  * Handle exit.Exception raised in notify_exception (via pytest_internalerror), e.g. when quitting pdb from post mortem.
+-  * default value of junit_family option will change to xunit2 in
+-    pytest 6.0, given that this is the version supported by default in
+-    modern tools that manipulate this type of file.
+-  * In order to smooth the transition, pytest will issue a warning in
+-    case the --junitxml option is given in the command line but
+-    junit_family is not explicitly configured in pytest.ini.
+-
+--------------------------------------------------------------------
+-Mon Nov 18 08:14:19 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Update to 5.2.4:
+-  * #6099: Fix --trace when used with parametrized functions.
+-  * #6183: Using request as a parameter name in @pytest.mark.parametrize now produces a more user-friendly error.
+-  * #6194: Fix incorrect discovery of non-test __init__.py files.
+-
+--------------------------------------------------------------------
+-Tue Nov  5 11:01:48 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Update to 5.2.2:
+-  * #5206: Fix --nf to not forget about known nodeids with partial test selection.
+-  * #5906: Fix crash with KeyboardInterrupt during --setup-show.
+-  * #5946: Fixed issue when parametrizing fixtures with numpy arrays (and possibly other sequence-like types).
+-  * #6044: Properly ignore FileNotFoundError exceptions when trying to remove old temporary directories, for instance when multiple processes try to remove the same directory (common with pytest-xdist for example).
+-
+--------------------------------------------------------------------
+-Wed Oct  9 14:13:11 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Update to 5.2.1:
+-  * #5902: Fix warnings about deprecated cmp attribute in attrs>=19.2.
+-  * #1682: Passing arguments to pytest.fixture() as positional arguments is deprecated - pass them as a keyword argument instead.
+-  * #1682: The scope parameter of @pytest.fixture can now be a callable that receives the fixture name and the config object as keyword-only parameters. See the docs for more information.
+-  * #5764: New behavior of the --pastebin option: failures to connect to the pastebin server are reported, without failing the pytest run
+-
+--------------------------------------------------------------------
+-Mon Sep 23 12:30:16 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Update to 5.1.3:
+-  * #5807: Fix pypy3.6 (nightly) on windows.
+-  * #5811: Handle --fulltrace correctly with pytest.raises.
+-  * #5819: Windows: Fix regression with conftest whose qualified name contains uppercase characters
+-
+--------------------------------------------------------------------
+-Mon Sep  9 14:11:58 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Update to 5.1.2:
+-  * #2270: Fixed self reference in function-scoped fixtures defined plugin classes: previously self would be a reference to a test class, not the plugin class.
+-  * #570: Fixed long standing issue where fixture scope was not respected when indirect fixtures were used during parametrization.
+-  * #5782: Fix decoding error when printing an error response from --pastebin.
+-  * #5786: Chained exceptions in test and collection reports are now correctly serialized, allowing plugins like pytest-xdist to display them properly.
+-
+--------------------------------------------------------------------
+-Fri Aug 23 12:58:40 UTC 2019 - Ondřej Súkup <mimi.vx@gmail.com>
+-
+-- Update to 5.1.1
+- * Removed:
+-   + Request.getfuncargvalue: use Request.getfixturevalue instead.
+-   + pytest.raises and pytest.warns no longer support strings as the second argument.
+-   + message parameter of pytest.raises.
+-   + pytest.raises, pytest.warns and ParameterSet.param now use native keyword-only
+-     syntax. This might change the exception message from previous versions, but
+-     they still raise TypeError on unknown keyword arguments as before.
+-   + pytest.config global variable.
+-   + tmpdir_factory.ensuretemp method.
+-   + pytest_logwarning hook.
+-   + RemovedInPytest4Warning warning type.
+-   + request is now a reserved name for fixtures.
+-   + Removed unused support code for unittest2.
+-   + pytest.fail, pytest.xfail and pytest.skip no longer support bytes
+-     for the message argument.
+- * New Config.invocation_args attribute containing the unchanged arguments passed to pytest.main().
+- * New NUMBER option for doctests to ignore irrelevant differences in floating-point numbers
+- * JUnit XML now includes a timestamp and hostname in the testsuite tag.
+- * Fix RuntimeError/StopIteration when trying to collect package with “__init__.py” only.
+- * Warnings issued during pytest_configure are explicitly not treated as errors,
+-    even if configured as such, because it otherwise completely breaks pytest.
+- * The XML file produced by --junitxml now correctly contain a <testsuites> root element.
+- * Fixed using multiple short options together in the command-line (for example -vs) in Python 3.8+.
+- * Fix issue where tmp_path and tmpdir would not remove directories containing
+-    files marked as read-only, which could lead to pytest crashing when executed
+-    a second time with the --basetemp option.
+- * Replace importlib_metadata backport with importlib.metadata from the standard
+-    library on Python 3.8+.
+- * Improve type checking for some exception-raising functions (pytest.xfail,
+-    pytest.skip, etc) so they provide better error messages when users meant
+-    to use marks (for example @pytest.xfail instead of @pytest.mark.xfail).
+- * Fixed internal error when test functions were patched with objects that cannot
+-    be compared for truth values against others, like numpy arrays.
+- * pytest.exit is now correctly handled in unittest cases. This makes unittest
+-    cases handle quit from pytest’s pdb correctly.
+- * Improved output when parsing an ini configuration file fails.
+- * Fix collection of staticmethod objects defined with functools.partial.
+- * Skip async generator test functions, and update the warning message to refer
+-    to async def functions.
+-
+--------------------------------------------------------------------
+-Fri Jul 19 10:16:21 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Add setuptools requires as we still use entrypoints
+-
+--------------------------------------------------------------------
+-Tue Jul  9 11:25:49 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Python-pytest4 contains pytest4; python-pytest3 contains pytest3
+-  the main package from now on will be tracking upstream releases
+-- Update to 5.0.1:
+-  * Major update; from now on supporting only python3+
+-- Remove merged patches:
+-  * fix_test_raises_exception_looks_iterable.patch
+-  * importlib-metadata.patch
++Mon Apr  4 11:55:35 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Update to 5.4.3 as we need Python 3.10 support
++- Strictly require Python 3.10 with saltbundlepy requrement
++
++- Added:
++  * pytest-5.4.3.tar.gz
++  * tidy-up-embeddedfile.patch
++  * fix-assertion-rewriting-on-python3.10.patch
++
++- Removed:
++  * pytest-3.10.1.tar.gz
++  * fix_test_raises_exception_looks_iterable
+   * new-pluggy.patch
+   * sphinx2.0.patch
++  * importlib-metadata.patch
++  * importlib-py38.patch
++  * attrs.patch
++
++-------------------------------------------------------------------
++Thu Mar 26 07:29:49 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
++
++- Skip garbage test https://bugs.python.org/issue23841
++- Update in SLE bsc#1167732
++
++-------------------------------------------------------------------
++Thu Mar 26 06:15:43 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
++
++- Do pull in properly pytest not pytest3
++
++-------------------------------------------------------------------
++Wed Mar 25 16:28:18 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
++
++- Remove docu part so we don't need to pull the dependencies
++
++-------------------------------------------------------------------
++Fri Oct 11 08:11:46 UTC 2019 - Ondřej Súkup <mimi.vx@gmail.com>
++
++- add attrs.patch  - fix compatibility with attrs-19.2+
++
++-------------------------------------------------------------------
++Wed Sep 25 09:39:55 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
++
++- Revert the importlib-metadata.patch change from last
++  change and split it to separate patch adding more content:
++  * importlib-py38.patch
++  * importlib-metadata.patch
++
++-------------------------------------------------------------------
++Wed Sep 11 11:19:59 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>
++
++- Update importlib-metadata.patch to not pull in the importlib
++  on python 3.8+
+ 
+ -------------------------------------------------------------------
+ Tue Jun 11 07:02:25 UTC 2019 - Tomáš Chvátal <tchvatal@suse.com>

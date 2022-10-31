@@ -1,0 +1,91 @@
+--- swig.spec
++++ saltbundle-swig.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package swig
++# spec file for package saltbundle-swig
+ #
+-# Copyright (c) 2022 SUSE LLC
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -17,33 +17,26 @@
+ 
+ 
+ %bcond_with  swig_ocaml
+-%if 0%{?fedora} + 0%{?rhel_version} + 0%{?centos_version} > 0
++%if 0%{?fedora} + 0%{?rhel} + 0%{?centos_version} > 0
+ %define docpath %{_docdir}/%{name}-%{version}
+ BuildRequires:  perl-Test-Simple
+ BuildRequires:  perl-devel
+-%if 0%{?centos_version} < 800
+-BuildRequires:  ruby
+-%endif
+ %endif
+ %if 0%{?suse_version} > 0
+ %define docpath %{_docdir}/%{name}
+-BuildRequires:  ruby-devel
+ %endif
+-Name:           swig
++Name:           saltbundle-swig
+ Version:        4.0.2
+ Release:        0
+ Summary:        Simplified Wrapper and Interface Generator
+ License:        BSD-3-Clause AND GPL-3.0-or-later
+ Group:          Development/Languages/C and C++
+ URL:            http://www.swig.org/
+-Source:         http://prdownloads.sourceforge.net/swig/%{name}-%{version}.tar.gz
+-Source1:        %{name}.rpmlintrc
++Source:         swig-%{version}.tar.gz
++Source1:        swig.rpmlintrc
+ 
+ # PATCH-FIX-UPSTREAM swig-octave-6.patch gh#swig/swig#2020 badshah400@gmail.com -- Allow swig to work with octave 6 and above; patch part of upstream merge request
+ Patch0:         swig-octave-6.patch
+-Patch1:         fix-gcc12-error.patch
+-# PATCH-FIX-UPSTREAM swig-python310.patch -- gh#swig/swig#2064, Fix swig test suite with python310
+-Patch2:         swig-python310.patch
+ Patch308:       swig308-isfinite.diff
+ 
+ BuildRequires:  autoconf
+@@ -55,18 +48,16 @@
+ BuildRequires:  pcre-devel
+ BuildRequires:  perl
+ BuildRequires:  pkgconfig
++BuildRequires:  saltbundlepy-devel
++BuildRequires:  saltbundlepy-rpm-macros
++BuildRequires:  saltbundlepy-tools
+ %if 0%{?centos_version} >= 800
+ BuildRequires:  boost-devel
+-BuildRequires:  python3-devel
+-BuildRequires:  python3-tools
+ %else
+ %if 0%{?suse_version} >= 1500
+ BuildRequires:  libboost_headers-devel
+-BuildRequires:  python3-devel
+-BuildRequires:  python3-tools
+ %else
+ BuildRequires:  boost-devel
+-BuildRequires:  python-devel > 2.6
+ %endif
+ %endif
+ %if %{with swig_ocaml}
+@@ -125,7 +116,7 @@
+ understandig SWIG usage.
+ 
+ %prep
+-%setup -q
++%setup -q -n swig-%{version}
+ %autopatch -p1
+ 
+ %build
+@@ -141,9 +132,7 @@
+ make %{?_smp_mflags}
+ 
+ %check
+-%if 0%{?suse_version} >= 1500 || 0%{?centos_version} >= 800
+ export PY3=true
+-%endif
+ make %{?_smp_mflags} check
+ 
+ %install

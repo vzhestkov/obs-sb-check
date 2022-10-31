@@ -1,0 +1,11 @@
+--- python-pyasn1.changes
++++ saltbundlepy-pyasn1.changes
+@@ -1,3 +1,8 @@
++-------------------------------------------------------------------
++Mon Apr  4 12:50:50 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++
+ -------------------------------------------------------------------
+ Sun Nov 26 21:22:26 UTC 2017 - arun@gmx.de
+ 

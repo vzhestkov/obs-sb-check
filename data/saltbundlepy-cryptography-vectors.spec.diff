@@ -1,0 +1,43 @@
+--- python-cryptography-vectors.spec
++++ saltbundlepy-cryptography-vectors.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-cryptography-vectors
++# spec file for package saltbundlepy-cryptography-vectors
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,9 +16,15 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-cryptography-vectors
+-Version:        3.3.2
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-cryptography-vectors
++Version:        2.8
+ Release:        0
+ Summary:        Test vectors for the cryptography package
+ License:        Apache-2.0 OR BSD-3-Clause
+@@ -27,10 +33,12 @@
+ Source0:        https://files.pythonhosted.org/packages/source/c/cryptography_vectors/cryptography_vectors-%{version}.tar.gz
+ Source1:        https://files.pythonhosted.org/packages/source/c/cryptography_vectors/cryptography_vectors-%{version}.tar.gz.asc
+ Source2:        %{name}.keyring
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildArch:      noarch
++Requires:       saltbundlepy-base
+ %python_subpackages
+ 
+ %description

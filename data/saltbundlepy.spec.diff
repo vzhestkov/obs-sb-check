@@ -1,0 +1,684 @@
+--- python310.spec
++++ saltbundlepy.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file
++# spec file for package saltbundlepy
+ #
+ # Copyright (c) 2022 SUSE LLC
+ #
+@@ -16,59 +16,65 @@
+ #
+ 
+ 
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++%define build_with_opt 1
++%if 0%{?raspbian} || 0%{?rhel} == 7 || 0%{?suse_version} == 1315
++%define build_with_opt 0
++%endif
++%if 0%{?debian} == 11
++%ifarch ppc64el s390x
++%define build_with_opt 0
++%endif
++%endif
++
++%define _without_idle 1
++
+ %global flavor @BUILD_FLAVOR@%{nil}
+ %if "%{flavor}" == "doc"
+ %define psuffix -documentation
+ %bcond_without doc
+ %bcond_with base
+ %bcond_with general
++%bcond_with idle
+ %endif
+ %if "%{flavor}" == "base"
+ %define psuffix -core
+ %bcond_with doc
+ %bcond_without base
+ %bcond_with general
++%bcond_with idle
+ %endif
+ %if "%{flavor}" == ""
+ %define psuffix %{nil}
+ %bcond_with doc
+ %bcond_with base
+ %bcond_without general
+-%endif
+-
+-%if 0%{?sle_version} && 0%{?suse_version} < 1550
+-# Obsoleting previous "latest" Python versions
+-# Next versions will get more lines like for older versions
+-%define obsolete_python_versioned() \
+-Obsoletes:      python39%{?1:-%{1}}
+-%else
+-%define obsolete_python_versioned() %{nil}
+-%endif
+-
+-# Setting up variables
++%bcond_without idle
++%endif
++
+ %define _version %(c=%{version}; echo ${c/[a-z]*/})
+ %define tar_suffix %(c=%{_version}; echo ${c#%{_version}})
+ %define python_version %(echo %{_version}|cut -d. -f1-2)
+ # based on the current source tarball
+ %define python_version_abitag %(c=%{python_version}; echo ${c//./})
+ # FIXME %%define python_version_soname %%(c=%%{python_version}; echo ${c//./_})
+-%define         python_version_soname   3_10
++%define         python_version_soname   sb3_10
+ %if 0%(test -n "%{tar_suffix}" && echo 1)
+ %define _version %(echo "%{_version}~%{tar_suffix}")
+ %define tarversion %{version}
+ %else
+ %define tarversion %{version}
+ %endif
+-%define         python_pkg_name python310
++%define         python_pkg_name saltbundlepy
++%define         python_libs_pkg_name saltbundlepy-libs
+ # Will provide the python3-* provides
+ # Will do the /usr/bin/python3 and all the core links
+-%if 0%{?sle_version} || 0%{?suse_version} < 1550
+-%define primary_interpreter 0
+-%else
+-%define primary_interpreter 1
+-%endif
++%define         primary_interpreter 0
+ # We don't process beta signs well
+-%define         folderversion 3.10.5
++%define         folderversion 3.10.2
+ %define         tarname    Python-%{tarversion}
+ %define         sitedir         %{_libdir}/python%{python_version}
+ # three possible ABI kinds: m - pymalloc, d - debug build; see PEP 3149
+@@ -91,27 +97,35 @@
+ %if "%{_arch}" == "arm"
+ %define armsuffix hf
+ %endif
+-# Decide whether we want to use mpdecimal
+-%if 0%{?suse_version} >= 1550
+-%bcond_without mpdecimal
+-%else
+-%bcond_with mpdecimal
++%if "%{_arch}" == "armhf"
++%define archname arm
++%define armsuffix eabihf
++%endif
++# Change archname macro from amd64 to x86_64 for Debian/Ubuntu
++%if "%{_arch}" == "amd64"
++%define archname x86_64
++%endif
++# Change archname macro from arm64 to aarch64 for Debian/Ubuntu
++%if "%{_arch}" == "arm64"
++%define archname aarch64
++%endif
++# Change archname macro from ppc64el to powerpc64le for Debian/Ubuntu
++%if "%{_arch}" == "ppc64el"
++%define archname powerpc64le
+ %endif
+ # pyexpat.cpython-35m-x86_64-linux-gnu
+ # pyexpat.cpython-35m-powerpc64le-linux-gnu
+ # pyexpat.cpython-35m-armv7-linux-gnueabihf
+ # _md5.cpython-38m-x86_64-linux-gnu.so
+ %define dynlib() %{sitedir}/lib-dynload/%{1}.cpython-%{abi_tag}-%{archname}-%{_os}%{?_gnu}%{?armsuffix}.so
+-%bcond_without profileopt
+ Name:           %{python_pkg_name}%{psuffix}
+-Version:        3.10.5
++Version:        3.10.2
+ Release:        0
+ Summary:        Python 3 Interpreter
+ License:        Python-2.0
+ URL:            https://www.python.org/
+ Source0:        http://www.python.org/ftp/python/%{folderversion}/%{tarname}.tar.xz
+ Source1:        http://www.python.org/ftp/python/%{folderversion}/%{tarname}.tar.xz.asc
+-Source2:        baselibs.conf
+ Source3:        README.SUSE
+ Source7:        macros.python3
+ Source8:        import_failed.py
+@@ -126,7 +140,7 @@
+ # 3. mkdir Vendor && mv usr/include/* Vendor/
+ # 4. tar cJf bluez-devel-vendor.tar.xz Vendor/
+ Source21:       bluez-devel-vendor.tar.xz
+-Source98:       python310-rpmlintrc
++Source98:       saltbundlepy-rpmlintrc
+ # Tarball is signed by the GPG key of Pablo Galindo Salgado (0x64E628F8D684696D)
+ # https://keybase.io/pablogsal/pgp_keys.asc?fingerprint=a035c8c19219ba821ecea86b64e628f8d684696d
+ Source99:       python.keyring
+@@ -164,19 +178,19 @@
+ # PATCH-FIX-SLE fix_configure_rst.patch bpo#43774 mcepl@suse.com
+ # remove duplicate link targets and make documentation with old Sphinx in SLE
+ Patch35:        fix_configure_rst.patch
+-# PATCH-FIX-UPSTREAM bpo-46811 gh#python/cpython#7da97f61816f mcepl@suse.com
+-# NOTE: SUSE version of expat 2.4.4 is patched in SUSE for CVE-2022-25236
+-Patch36:        support-expat-CVE-2022-25236-patched.patch
+-# PATCH-FIX-UPSTREAM CVE-2015-20107-mailcap-unsafe-filenames.patch bsc#1198511 mcepl@suse.com
+-# avoid the command injection in the mailcap module.
+-Patch37:        CVE-2015-20107-mailcap-unsafe-filenames.patch
++Patch100:       call-startup-script-always.patch
++Patch111:       no-strict-openssl111-dep.patch
+ BuildRequires:  autoconf-archive
+ BuildRequires:  automake
+ BuildRequires:  fdupes
+ BuildRequires:  gmp-devel
+ BuildRequires:  lzma-devel
+ BuildRequires:  netcfg
++%if 0%{?suse_version} == 1315
++BuildRequires:  saltbundle-openssl-devel
++%else
+ BuildRequires:  openssl-devel
++%endif
+ BuildRequires:  pkgconfig
+ BuildRequires:  xz
+ BuildRequires:  pkgconfig(bzip2)
+@@ -185,46 +199,46 @@
+ BuildRequires:  pkgconfig(uuid)
+ BuildRequires:  pkgconfig(zlib)
+ #!BuildIgnore:  gdk-pixbuf-loader-rsvg
+-%if 0%{?suse_version} >= 1550
+-# The provider for python(abi) is in rpm-build-python
+-BuildRequires:  rpm-build-python
+-%endif
+-%if 0%{?suse_version} >= 1500
++BuildRequires:  saltbundlepy-rpm-macros
++%if 0%{?suse_version} >= 1500 || 0%{?rhel} >= 8 || 0%{?fedora_version} >= 33
+ BuildRequires:  pkgconfig(libnsl)
+ BuildRequires:  pkgconfig(libtirpc)
+ %endif
+-%if %{with mpdecimal}
+-BuildRequires:  mpdecimal-devel
+-%endif
+ %if %{with doc}
+-%if 0%{?sle_version} && 0%{?sle_version} <= 150300
++%if 0%{?suse_version} >= 1550
++BuildRequires:  %{python_pkg_name}-Sphinx
++BuildRequires:  %{python_pkg_name}-python-docs-theme
++%else
+ BuildRequires:  python3-Sphinx
+-%else
+-BuildRequires:  python3-Sphinx >= 3.2.0
+-%endif
+-%if 0%{?suse_version} >= 1500
+-BuildRequires:  python3-python-docs-theme >= 2022.1
++BuildRequires:  python3-python-docs-theme
+ %endif
+ %endif
+ %if %{with general}
++%if %{with idle}
+ # required for idle3 (.desktop and .appdata.xml files)
+ BuildRequires:  appstream-glib
++BuildRequires:  update-desktop-files
++%endif
+ BuildRequires:  gcc-c++
+ BuildRequires:  gdbm-devel
+ BuildRequires:  gettext
+ BuildRequires:  readline-devel
+ BuildRequires:  sqlite-devel
+ BuildRequires:  timezone
+-BuildRequires:  update-desktop-files
+ BuildRequires:  pkgconfig(ncurses)
+ BuildRequires:  pkgconfig(tk)
+ BuildRequires:  pkgconfig(x11)
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name}-base >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name}-base = %{version}
++%endif
++%if 0%{?centos_version} != 700
+ Recommends:     %{python_pkg_name}-curses
+ Recommends:     %{python_pkg_name}-dbm
+ Recommends:     %{python_pkg_name}-pip
+-%obsolete_python_versioned
+-%if %{primary_interpreter}
++%endif
++%if %{primary_interpreter} && "%{python_pkg_name}" != "python3"
+ Provides:       python3 = %{python_version}
+ %endif
+ %endif
+@@ -246,8 +260,7 @@
+ %package -n %{python_pkg_name}-tk
+ Summary:        TkInter, a Python Tk Interface
+ Requires:       %{python_pkg_name} = %{version}
+-%obsolete_python_versioned tk
+-%if %{primary_interpreter}
++%if %{primary_interpreter} && "%{python_pkg_name}" != "python3"
+ Provides:       python3-tk = %{version}
+ %endif
+ 
+@@ -256,9 +269,12 @@
+ 
+ %package -n %{python_pkg_name}-curses
+ Summary:        Python Interface to the (N)Curses Library
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name} >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name} = %{version}
+-%obsolete_python_versioned curses
+-%if %{primary_interpreter}
++%endif
++%if %{primary_interpreter} && "%{python_pkg_name}" != "python3"
+ Provides:       python3-curses
+ %endif
+ 
+@@ -268,9 +284,12 @@
+ 
+ %package -n %{python_pkg_name}-dbm
+ Summary:        Python Interface to the GDBM Library
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name} >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name} = %{version}
+-%obsolete_python_versioned dbm
+-%if %{primary_interpreter}
++%endif
++%if %{primary_interpreter} && "%{python_pkg_name}" != "python3"
+ Provides:       python3-dbm
+ %endif
+ 
+@@ -278,12 +297,16 @@
+ An easy to use interface for Unix DBM databases, and more specifically,
+ the GNU implementation GDBM.
+ 
++%if %{with idle}
+ %package -n %{python_pkg_name}-idle
+ Summary:        An Integrated Development Environment for Python
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name} >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name} = %{version}
++%endif
+ Requires:       %{python_pkg_name}-tk
+-%obsolete_python_versioned idle
+-%if %{primary_interpreter}
++%if %{primary_interpreter} && "%{python_pkg_name}" != "python3"
+ Provides:       python3-idle = %{version}
+ %endif
+ 
+@@ -292,11 +315,17 @@
+ It features a multi-window text editor with multiple undo, Python
+ colorizing, and many other things, as well as a Python shell window and
+ a debugger.
++%endif
+ 
+ %package -n %{python_pkg_name}-doc
+ Summary:        Package Documentation for Python 3
+-Enhances:       %{python_pkg_name} = %{python_version}
+-%obsolete_python_versioned doc
++%if 0%{?centos_version} != 700
++%if "%_vendor" == "debbuild"
++Enhances:       %{python_pkg_name} >= %{_version}-~
++%else
++Enhances:       %{python_pkg_name} = %{version}
++%endif
++%endif
+ %if %{primary_interpreter}
+ Provides:       python3-doc = %{version}
+ %endif
+@@ -308,7 +337,6 @@
+ 
+ %package -n %{python_pkg_name}-doc-devhelp
+ Summary:        Additional Package Documentation for Python 3 in devhelp format
+-%obsolete_python_versioned doc-devhelp
+ %if %{primary_interpreter}
+ Provides:       python3-doc-devhelp = %{version}
+ %endif
+@@ -320,20 +348,26 @@
+ 
+ %package -n %{python_pkg_name}-base
+ Summary:        Python 3 Interpreter and Stdlib Core
+-Requires:       libpython%{so_version} = %{version}
++%if 0%{?suse_version} == 1315
++Requires:       saltbundle-libopenssl1_0_0
++%endif
++Requires:       %{python_libs_pkg_name} = %{version}
++%if 0%{?centos_version} != 700
++%if "%_vendor" == "debbuild"
++Recommends:     %{python_pkg_name} >= %{_version}-~
++%else
+ Recommends:     %{python_pkg_name} = %{version}
+-%obsolete_python_versioned base
++%endif
++%endif
+ #Recommends:     python3-ensurepip
+ # python 3.1 didn't have a separate python-base, so it is wrongly
+ # not a conflict to have python3-3.1 and python3-base > 3.1
+-Obsoletes:      python3 < 3.2
++#Obsoletes:      python3 < 3.2
+ # no Provides, because python3 is obviously provided by package python3
+ # python 3.4 provides asyncio
+ Provides:       %{python_pkg_name}-asyncio = %{version}
+-%obsolete_python_versioned asyncio
+ # python 3.6 provides typing
+ Provides:       %{python_pkg_name}-typing = %{version}
+-%obsolete_python_versioned typing
+ # python3-xml was merged into python3, now moved into -base
+ Provides:       %{python_pkg_name}-xml = %{version}
+ %if %{primary_interpreter}
+@@ -360,10 +394,13 @@
+ 
+ %package -n %{python_pkg_name}-tools
+ Summary:        Python Utility and Demonstration Scripts
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name}-base >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name}-base = %{version}
++%endif
+ Provides:       %{python_pkg_name}-2to3 = %{version}
+ Provides:       %{python_pkg_name}-demo = %{version}
+-%obsolete_python_versioned tools
+ %if %{primary_interpreter}
+ Provides:       python3-2to3 = %{version}
+ Provides:       python3-demo = %{version}
+@@ -378,8 +415,11 @@
+ 
+ %package -n %{python_pkg_name}-devel
+ Summary:        Include Files and Libraries Mandatory for Building Python Modules
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name}-base >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name}-base = %{version}
+-%obsolete_python_versioned devel
++%endif
+ %if %{primary_interpreter}
+ Provides:       python3-devel = %{version}
+ %endif
+@@ -397,9 +437,13 @@
+ 
+ %package -n %{python_pkg_name}-testsuite
+ Summary:        Unit tests for Python and its standard library
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name} >= %{_version}-~
++Requires:       %{python_pkg_name}-tk >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name} = %{version}
+ Requires:       %{python_pkg_name}-tk = %{version}
+-%obsolete_python_versioned testsuite
++%endif
+ %if %{primary_interpreter}
+ Provides:       python3-testsuite = %{version}
+ %endif
+@@ -409,11 +453,15 @@
+ of the installed Python interpreter and standard library.
+ They are a documented part of stdlib, as a module 'test'.
+ 
+-%package -n libpython%{so_version}
++%package -n %{python_libs_pkg_name}
+ Summary:        Python Interpreter shared library
++%if "%_vendor" == "debbuild"
++Requires:       %{python_pkg_name}-base >= %{_version}-~
++%else
+ Requires:       %{python_pkg_name}-base >= %{version}
+-
+-%description -n libpython%{so_version}
++%endif
++
++%description -n %{python_libs_pkg_name}
+ Python is an interpreted, object-oriented programming language, and is
+ often compared to Tcl, Perl, Scheme, or Java.  You can find an overview
+ of Python in the documentation and tutorials included in the python-doc
+@@ -432,35 +480,31 @@
+ %patch09 -p1
+ %patch15 -p1
+ %patch29 -p1
++%if 0%{?suse_version} <= 1500
++%patch33 -p1
++%endif
+ %if 0%{?sle_version} && 0%{?sle_version} <= 150300
+-%patch33 -p1
+ %patch34 -p1
+ %endif
+ %patch35 -p1
+-%patch36 -p1
+-%patch37 -p1
++
++%patch100 -p1
++
++%if 0%{?centos} == 7 || 0%{?debian} == 9 || 0%{?suse_version} == 1315 || 0%{?suse_version} == 1500
++%patch111 -p1
++%endif
+ 
+ # drop Autoconf version requirement
+ sed -i 's/^AC_PREREQ/dnl AC_PREREQ/' configure.ac
+ 
+-%if %{primary_interpreter}
+ # fix shebangs - convert /usr/local/bin/python and /usr/bin/env/python to /usr/bin/python3
+ for dir in Lib Tools; do
+     # find *.py, filter to files that contain bad shebangs
+     # break up "/""usr" like this to prevent replacing with %%{_prefix}
+     find $dir -name '*.py' -type f -print0 \
+         | xargs -0 grep -lE '^#! *(/''usr/.*bin/(env +)?)?python' \
+-        | xargs sed -r -i -e '1s@^#![[:space:]]*(/''usr/(local/)?bin/(env +)?)?python([0-9]+(\.[0-9]+)?)?@#!%{_bindir}/python3@'
++        | xargs sed -r -i -e '1s@^#![[:space:]]*(/''usr/(local/)?bin/(env +)?)?python([0-9]+(\.[0-9]+)?)?@#!%{_bindir}/python%{python_version}@'
+ done
+-%else
+-# For non-primary Python, just don't bother (bsc#1193179) and remove all
+-# those shebangs
+-for dir in Lib Tools; do
+-    find $dir -name '*.py' -type f -exec sed -i '1{/^#!.*python/ d}' '{}' \;
+-done
+-# We shortened the file Lib/pdb.py so we have to move the test breakpoint location
+-sed -i -e '/Breakpoint 3 at ...pdb.py:94/s/94/93/' Lib/test/test_pdb.py
+-%endif
+ 
+ # drop in-tree libffi and expat
+ rm -r Modules/_ctypes/libffi* Modules/_ctypes/darwin
+@@ -487,7 +531,11 @@
+ %else
+ %define _lto_cflags %{nil}
+ # use rpm_opt_flags
++%if 0%{?suse_version} < 1500
++export OPT="%{optflags} -DOPENSSL_LOAD_CONF -fwrapv $(pkg-config --cflags-only-I libffi)"
++%else
+ export OPT="%{optflags} -DOPENSSL_LOAD_CONF -fwrapv $(pkg-config --cflags-only-I libffi) -fno-semantic-interposition"
++%endif
+ 
+ touch -r %{SOURCE0} Makefile.pre.in
+ 
+@@ -507,12 +555,9 @@
+     --with-ensurepip=no \
+     --with-system-ffi \
+     --with-system-expat \
++%if %{build_with_opt}
+     --with-lto \
+-%if %{with profileopt}
+     --enable-optimizations \
+-%endif
+-%if %{with mpdecimal}
+-    --with-system-libmpdec \
+ %endif
+     --enable-loadable-sqlite-extensions
+ 
+@@ -528,16 +573,17 @@
+ %make_build
+ %endif
+ %if %{with base}
+-%if %{with profileopt}
+-    target=profile-opt
+-%else
+-    target=all
++%if %{build_with_opt}
++target=profile-opt
++%else
++target=all
+ %endif
+ LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH \
+     %make_build $target
+ %endif
+ %endif
+ 
++%if %{with test}
+ %check
+ %if %{with general}
+ # exclude test_gdb -- it doesn't run in buildservice anyway, and fails on missing debuginfos
+@@ -567,6 +613,20 @@
+ # bsc#1195140 and bpo#37169 - test_capi is failing on openSUSE, and not sure why
+ EXCLUDE="$EXCLUDE test_capi"
+ 
++# CentOS7 is unable to create the tempfiles for tcl.evalfile
++%if 0%{?centos_version} == 700 && 0%{?rhel_version} != 700
++EXCLUDE="$EXCLUDE test_tcl"
++%endif
++
++# TODO: Document why these are disabled
++%if 0%{?centos_version} >= 700 && 0%{?rhel_version} != 700
++EXCLUDE="$EXCLUDE test_distutils"
++%endif
++
++%if "%_repository" == "Ubuntu_20.04"
++EXCLUDE="$EXCLUDE test_ssl"
++%endif
++
+ # Limit virtual memory to avoid spurious failures
+ if test $(ulimit -v) = unlimited || test $(ulimit -v) -gt 10000000; then
+   ulimit -v 10000000 || :
+@@ -579,6 +639,7 @@
+ %make_build -j1 test TESTOPTS="-u curses -v -x $EXCLUDE --timeout=3000"
+ # use network, be verbose:
+ #make test TESTOPTS="-l -u network -v"
++%endif
+ %endif
+ 
+ %install
+@@ -604,7 +665,11 @@
+ 
+ # clean out stuff that is in python-base and subpackages
+ 
++%if %{with idle}
+ find %{buildroot}%{_bindir} -mindepth 1 -not -name "*idle3*" -print -delete
++%else
++find %{buildroot}%{_bindir} -mindepth 1 -print -delete
++%endif
+ rm %{buildroot}%{_libdir}/lib*
+ rm -r %{buildroot}%{_libdir}/pkgconfig
+ rm -r %{buildroot}%{_mandir}/*
+@@ -614,6 +679,9 @@
+ find %{buildroot}%{sitedir} -name "*.egg-info" -delete
+ rm -r %{buildroot}%{sitedir}/__pycache__
+ rm -r %{buildroot}%{sitedir}/site-packages
++%if !%{with idle}
++rm -r %{buildroot}%{sitedir}/idlelib
++%endif
+ rm %{buildroot}%{sitedir}/*.*
+ 
+ for module in \
+@@ -641,6 +709,7 @@
+     eval rm "%{buildroot}%{sitedir}/lib-dynload/$library.*"
+ done
+ 
++%if %{with idle}
+ # Idle is not packaged in base due to the appstream-glib dependency
+ # move idle config into /etc
+ install -d -m 755 %{buildroot}%{_sysconfdir}/idle%{python_version}
+@@ -671,11 +740,21 @@
+ sed -i -e 's:idle3.desktop:idle%{python_version}.desktop:g' idle%{python_version}.appdata.xml
+ install -m 644 -D -t %{buildroot}%{_datadir}/metainfo idle%{python_version}.appdata.xml
+ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/idle%{python_version}.appdata.xml
++%endif
+ 
+ %fdupes %{buildroot}/%{_libdir}/python%{python_version}
+ %endif
+ %if %{with base}
+ %make_install
++
++# HACK: %files sections complains about not finding this directory
++mkdir -p %{buildroot}%{_defaultlicensedir}/%{python_pkg_name}-base
++
++%if !%{with idle}
++# remove idle stuff (not needed for the bundle)
++rm -r %{buildroot}%{sitedir}/idlelib
++rm %{buildroot}%{_bindir}/idle3*
++%endif
+ 
+ # remove .a
+ find %{buildroot} -name "*.a" -delete
+@@ -687,7 +766,11 @@
+ mkdir -p %{buildroot}%{_prefix}/lib/python%{python_version}/site-packages/__pycache__
+ 
+ # cleanup parts that don't belong
++%if %{with idle}
+ for dir in curses dbm sqlite3 tkinter idlelib; do
++%else
++for dir in curses dbm sqlite3 tkinter; do
++%endif
+     find "%{buildroot}/%{sitedir}/$dir"/* -maxdepth 0 -name "test" -o -exec rm -rf {} +
+ done
+ rm -fv %{buildroot}%{dynlib nis}
+@@ -709,9 +792,6 @@
+ 
+ # link shared library instead of static library that tools expect
+ ln -s ../../libpython%{python_abi}.so %{buildroot}%{_libdir}/python%{python_version}/config-%{python_abi}-%{archname}-%{_os}%{?_gnu}%{?armsuffix}/libpython%{python_abi}.so
+-
+-# delete idle3, which has to many packaging dependencies for base
+-rm %{buildroot}%{_bindir}/idle3*
+ 
+ # delete the generic 2to3 binary if we are not primary
+ %if !%{primary_interpreter}
+@@ -800,6 +880,7 @@
+ %{dynlib _sqlite3}
+ %{dynlib nis}
+ 
++%if %{with idle}
+ %files -n %{python_pkg_name}-idle
+ %defattr(644, root, root, 755)
+ %{sitedir}/idlelib
+@@ -820,27 +901,30 @@
+ %dir %{_datadir}/icons/hicolor/48x48
+ %dir %{_datadir}/icons/hicolor/*/apps
+ %attr(755, root, root) %{_bindir}/idle%{python_version}
++%endif
+ # endif for if general
+ %endif
+ 
+ %if %{with doc}
+ %files -n %{python_pkg_name}-doc
++%defattr(644, root, root, 755)
+ %dir %{_docdir}/python%{python_version}
+ %doc %{_docdir}/python%{python_version}/Misc
+ %doc %{_docdir}/python%{python_version}/html
+ 
+ %files -n %{python_pkg_name}-doc-devhelp
++%defattr(644, root, root, 755)
+ %dir %{_datadir}/gtk-doc
+ %dir %{_datadir}/gtk-doc/html
+ %doc %{_datadir}/gtk-doc/html/Python%{python_version}
+ %endif
+ 
+ %if %{with base}
+-%post -n libpython%{so_version} -p /sbin/ldconfig
+-%postun -n libpython%{so_version} -p /sbin/ldconfig
+-
+-%files -n libpython%{so_version}
+-%defattr(644, root,root)
++%post -n %{python_libs_pkg_name} -p /sbin/ldconfig
++%postun -n %{python_libs_pkg_name} -p /sbin/ldconfig
++
++%files -n %{python_libs_pkg_name}
++%defattr(644, root,root, 755)
+ %{_libdir}/libpython%{python_abi}.so.%{so_major}.%{so_minor}
+ 
+ %files -n %{python_pkg_name}-tools
+@@ -855,13 +939,14 @@
+ %files -n %{python_pkg_name}-devel
+ %defattr(644, root, root, 755)
+ %{_libdir}/libpython%{python_abi}.so
++%{_libdir}/libpython%{python_version}.so
+ %if %{primary_interpreter}
+ %{_libdir}/libpython3.so
+ %endif
+ %{_libdir}/pkgconfig/*
+ %{_includedir}/python%{python_abi}
+ %{sitedir}/config-%{python_abi}-*
+-%defattr(755, root, root)
++%defattr(755, root, root, 755)
+ %{_bindir}/python%{python_abi}-config
+ %if %{primary_interpreter}
+ %{_bindir}/python3-config
+@@ -895,6 +980,7 @@
+ %dir %{_docdir}/%{name}
+ %doc %{_docdir}/%{name}/README.rst
+ %license LICENSE
++%dir %{_defaultlicensedir}/%{python_pkg_name}-base
+ %doc %{_docdir}/%{name}/README.SUSE
+ %if %{primary_interpreter}
+ %{_mandir}/man1/python3.1%{?ext_man}

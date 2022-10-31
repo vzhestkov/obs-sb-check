@@ -1,0 +1,119 @@
+--- python-Jinja2.spec
++++ saltbundlepy-jinja2.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-Jinja2
++# spec file for package saltbundlepy-jinja2
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,35 +12,35 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%define oldpython python
+-Name:           python-Jinja2
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-jinja2
+ Version:        2.10.1
+ Release:        0
+ Summary:        A fast and easy to use template engine written in pure Python
+ License:        BSD-3-Clause
+ Group:          Development/Languages/Python
+-Url:            http://jinja.pocoo.org/
++URL:            http://jinja.pocoo.org/
+ Source:         https://files.pythonhosted.org/packages/source/J/Jinja2/Jinja2-%{version}.tar.gz
+ Patch0:         CVE-2020-28493.patch
+-BuildRequires:  %{python_module MarkupSafe}
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
++Patch1:         fix-using-deprecated-collections.patch
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module markupsafe}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-%ifpython2
+-Provides:       %{oldpython}-jinja2 = %{version}
+-Obsoletes:      %{oldpython}-jinja2 < %{version}
+-%endif
+-Requires:       python-Babel >= 0.8
+-Requires:       python-MarkupSafe >= 0.23
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-markupsafe >= 0.23
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+ BuildArch:      noarch
+-
+ %python_subpackages
+ 
+ %description
+@@ -58,29 +58,29 @@
+       </ul>
+     {% endblock %}
+ 
+-%package -n python-Jinja2-vim
++%package -n %{name}-vim
+ Summary:        Jinja2 syntax files for Vim
+ License:        BSD-3-Clause
+ Group:          Productivity/Text/Editors
+ Requires:       %{name} = %{version}
+-Recommends:     vim
++Requires:       vim
+ 
+-%description -n python-Jinja2-vim
++%description -n %{name}-vim
+ Vim syntax highlighting scheme for Jinja2 templates.
+ 
+-%package -n python-Jinja2-emacs
++%package -n %{name}-emacs
+ Summary:        Jinja2 syntax files for Emacs
+-License:        GPL-2.0+
++License:        GPL-2.0-or-later
+ Group:          Productivity/Text/Editors
+ Requires:       %{name} = %{version}
+-Recommends:     emacs
++Requires:       emacs
+ 
+-%description -n python-Jinja2-emacs
++%description -n %{name}-emacs
+ Emacs syntax highlighting scheme for Jinja2 templates.
+ 
+ %prep
+ %setup -q -n Jinja2-%{version}
+-%patch0 -p1
++%autopatch -p1
+ 
+ %build
+ %python_build
+@@ -100,14 +100,14 @@
+ %{python_sitelib}/jinja2
+ %{python_sitelib}/Jinja2-%{version}-py%{python_version}.egg-info
+ 
+-%files -n python-Jinja2-vim
++%files -n %{name}-vim
+ %defattr(-,root,root,-)
+ %dir %{_datadir}/vim
+ %dir %{_datadir}/vim/site
+ %dir %{_datadir}/vim/site/syntax
+ %{_datadir}/vim/site/syntax/jinja.vim
+ 
+-%files -n python-Jinja2-emacs
++%files -n %{name}-emacs
+ %defattr(-,root,root,-)
+ %{_datadir}/emacs/site-lisp/jinja.el
+ 

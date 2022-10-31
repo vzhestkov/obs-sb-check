@@ -1,0 +1,119 @@
+--- zeromq.spec
++++ saltbundle-zeromq.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package zeromq
++# spec file for package saltbundle-zeromq
+ #
+-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,13 +16,11 @@
+ #
+ 
+ 
+-%define lib_name libzmq5
+-%ifarch %{ix86} x86_64
+-%bcond_without pgm
+-%else
+-%bcond_with pgm
+-%endif
+-Name:           zeromq
++%global __brp_check_rpaths %{nil}
++
++%define lib_name saltbundle-libzmq
++
++Name:           saltbundle-zeromq
+ Version:        4.2.3
+ Release:        0
+ Summary:        Lightweight messaging kernel
+@@ -30,7 +28,7 @@
+ Group:          Productivity/Networking/Web/Servers
+ URL:            http://www.zeromq.org/
+ Source:         https://github.com/zeromq/libzmq/releases/download/v%{version}/zeromq-%{version}.tar.gz
+-Source99:       baselibs.conf
++Source1000:     saltbundle-zeromq-rpmlintrc
+ Patch1:         CVE-2019-6250.patch
+ Patch2:         CVE-2019-13132.patch
+ Patch3:         CVE-2020-15166.patch
+@@ -38,27 +36,12 @@
+ Patch5:         bsc1176258.patch
+ Patch6:         bsc1176256.patch
+ Patch7:         bsc1176257.patch
+-BuildRequires:  asciidoc
+ BuildRequires:  gcc-c++
+-BuildRequires:  libunwind-devel
+ BuildRequires:  pkgconfig
++BuildRequires:  saltbundle-libsodium-devel
+ BuildRequires:  xmlto
+-%if 0%{?suse_version} && 0%{?suse_version} <= 1110
+-BuildRequires:  libsodium-devel
+-BuildRequires:  libuuid-devel
+-%else
+-BuildRequires:  pkgconfig(libsodium)
+ BuildRequires:  pkgconfig(uuid)
+-%endif
+-%if %{with pgm}
+-BuildRequires:  openpgm-devel >= 5.1
+-BuildRequires:  python
+-%if 0%{?suse_version} && 0%{?suse_version} <= 1110
+-BuildRequires:  glib2-devel >= 2.8
+-%else
+-BuildRequires:  pkgconfig(glib-2.0) >= 2.8
+-%endif
+-%endif  # with pgm
++AutoReqProv:    0
+ 
+ %description
+ The ZeroMQ messaging kernel is a library extending the standard
+@@ -69,7 +52,8 @@
+ %package -n %{lib_name}
+ Summary:        Shared Library for ZeroMQ
+ Group:          Productivity/Networking/Web/Servers
+-Recommends:     %{name}-tools = %{version}
++Requires:       saltbundle-libsodium
++AutoReqProv:    0
+ 
+ %description -n %{lib_name}
+ The ZeroMQ messaging kernel is a library extending the standard
+@@ -86,6 +70,7 @@
+ Conflicts:      libzmq1
+ Conflicts:      libzmq2
+ Conflicts:      libzmq3
++AutoReqProv:    0
+ 
+ %description tools
+ The ZeroMQ messaging kernel is a library extending the standard
+@@ -99,7 +84,7 @@
+ Summary:        Development files for ZeroMQ
+ Group:          Development/Languages/C and C++
+ Requires:       %{lib_name} = %{version}
+-Provides:       libzmq-devel = %{version}
++AutoReqProv:    0
+ 
+ %description devel
+ The ZeroMQ messaging kernel is a library extending the standard
+@@ -110,16 +95,17 @@
+ This package holds the development files for ZeroMQ.
+ 
+ %prep
+-%autosetup -p1
++%autosetup -p1 -n zeromq-%{version}
+ 
+ %build
++%ifarch i386
++export LIBS="-ldl -latomic"
++%else
+ export LIBS=-ldl
++%endif
+ %configure \
+   --with-libsodium \
+   --enable-curve \
+-%if %{with pgm}
+-  --with-pgm \
+-%endif
+   --disable-static \
+   --disable-dependency-tracking \
+   --disable-silent-rules \

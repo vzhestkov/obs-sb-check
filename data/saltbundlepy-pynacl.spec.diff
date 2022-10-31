@@ -1,0 +1,64 @@
+--- python-PyNaCl.spec
++++ saltbundlepy-pynacl.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-PyNaCl
++# spec file for package saltbundlepy-pynacl
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,30 +12,38 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-PyNaCl
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-pynacl
+ Version:        1.2.1
+ Release:        0
+ Summary:        Python binding to the Networking and Cryptography (NaCl) library
+ License:        Apache-2.0
+ Group:          Development/Languages/Python
+-Url:            https://github.com/pyca/pynacl/
++URL:            https://github.com/pyca/pynacl/
+ Source:         https://pypi.org/packages/source/P/PyNaCl/PyNaCl-%{version}.tar.gz
+-BuildRequires:  %{python_module base}
+-BuildRequires:  %{python_module cffi}
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module pycparser}
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module cffi}
++BuildRequires:  %{saltbundlepy_module devel}
++BuildRequires:  %{saltbundlepy_module pycparser}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+ BuildRequires:  pkgconfig
+-BuildRequires:  python-rpm-macros
+-BuildRequires:  pkgconfig(libsodium)
+-Requires:       python-six
+-Requires:       python-cffi
++BuildRequires:  saltbundle-libsodium-devel
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundle-libsodium
++Requires:       saltbundlepy-cffi
++Requires:       saltbundlepy-six
++AutoReqProv:    0
+ %python_subpackages
+ 
+ %description

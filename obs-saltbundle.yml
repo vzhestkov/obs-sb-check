@@ -1,0 +1,453 @@
+__DEFAULT__:
+  dst_project: systemsmanagement:saltstack:bundle:testing
+  src_project: SUSE:SLE-15-SP4:Update
+
+saltbundle-libsodium:
+  src_name: libsodium
+  src_spec: libsodium.spec
+  dst_spec: saltbundle-libsodium.spec
+  src_changes: libsodium.changes
+  dst_changes: saltbundle-libsodium.changes
+
+saltbundle-swig:
+  src_name: swig
+  src_project: openSUSE:Factory
+  src_spec: swig.spec
+  dst_spec: saltbundle-swig.spec
+  src_changes: swig.changes
+  dst_changes: saltbundle-swig.changes
+
+saltbundle-zeromq:
+  src_name: zeromq
+  src_spec: zeromq.spec
+  dst_spec: saltbundle-zeromq.spec
+  src_changes: zeromq.changes
+  dst_changes: saltbundle-zeromq.changes
+
+saltbundlepy:
+  src_name: python310
+  src_spec: python310.spec
+  dst_spec: saltbundlepy.spec
+  src_changes: python310.changes
+  dst_changes: saltbundlepy.changes
+
+saltbundlepy-appdirs:
+  src_name: python-appdirs
+  src_spec: python-appdirs.spec
+  dst_spec: saltbundlepy-appdirs.spec
+  src_changes: python-appdirs.changes
+  dst_changes: saltbundlepy-appdirs.changes
+
+saltbundlepy-asn1crypto:
+  src_name: python-asn1crypto
+  src_spec: python-asn1crypto.spec
+  dst_spec: saltbundlepy-asn1crypto.spec
+  src_changes: python-asn1crypto.changes
+  dst_changes: saltbundlepy-asn1crypto.changes
+
+saltbundlepy-atomicwrites:
+  src_name: python-atomicwrites
+  src_spec: python-atomicwrites.spec
+  dst_spec: saltbundlepy-atomicwrites.spec
+  src_changes: python-atomicwrites.changes
+  dst_changes: saltbundlepy-atomicwrites.changes
+
+saltbundlepy-attrs:
+  src_name: python-attrs
+  src_spec: python-attrs.spec
+  dst_spec: saltbundlepy-attrs.spec
+  src_changes: python-attrs.changes
+  dst_changes: saltbundlepy-attrs.changes
+
+saltbundlepy-bcrypt:
+  src_name: python-bcrypt
+  src_spec: python-bcrypt.spec
+  dst_spec: saltbundlepy-bcrypt.spec
+  src_changes: python-bcrypt.changes
+  dst_changes: saltbundlepy-bcrypt.changes
+
+saltbundlepy-certifi:
+  src_name: python-certifi
+  src_spec: python-certifi.spec
+  dst_spec: saltbundlepy-certifi.spec
+  src_changes: python-certifi.changes
+  dst_changes: saltbundlepy-certifi.changes
+
+saltbundlepy-cffi:
+  src_name: python-cffi
+  src_project: openSUSE:Factory
+  src_spec: python-cffi.spec
+  dst_spec: saltbundlepy-cffi.spec
+  src_changes: python-cffi.changes
+  dst_changes: saltbundlepy-cffi.changes
+
+saltbundlepy-chardet:
+  src_name: python-chardet
+  src_spec: python-chardet.spec
+  dst_spec: saltbundlepy-chardet.spec
+  src_changes: python-chardet.changes
+  dst_changes: saltbundlepy-chardet.changes
+
+saltbundlepy-cryptography:
+  src_name: python-cryptography
+  src_spec: python-cryptography.spec
+  dst_spec: saltbundlepy-cryptography.spec
+  src_changes: python-cryptography.changes
+  dst_changes: saltbundlepy-cryptography.changes
+
+saltbundlepy-cryptography-vectors:
+  src_name: python-cryptography-vectors
+  src_spec: python-cryptography-vectors.spec
+  dst_spec: saltbundlepy-cryptography-vectors.spec
+  src_changes: python-cryptography-vectors.changes
+  dst_changes: saltbundlepy-cryptography-vectors.changes
+
+saltbundlepy-cssselect:
+  src_name: python-cssselect
+  src_spec: python-cssselect.spec
+  dst_spec: saltbundlepy-cssselect.spec
+  src_changes: python-cssselect.changes
+  dst_changes: saltbundlepy-cssselect.changes
+
+saltbundlepy-cython:
+  src_name: python-Cython
+  src_project: openSUSE:Factory
+  src_spec: python-Cython.spec
+  dst_spec: saltbundlepy-cython.spec
+  src_changes: python-Cython.changes
+  dst_changes: saltbundlepy-cython.changes
+
+saltbundlepy-distro:
+  src_name: python-distro
+  src_spec: python-distro.spec
+  dst_spec: saltbundlepy-distro.spec
+  src_changes: python-distro.changes
+  dst_changes: saltbundlepy-distro.changes
+
+saltbundlepy-docker:
+  src_name: python-docker
+  src_spec: python-docker.spec
+  dst_spec: saltbundlepy-docker.spec
+  src_changes: python-docker.changes
+  dst_changes: saltbundlepy-docker.changes
+
+saltbundlepy-docker-pycreds:
+  src_name: python-docker-pycreds
+  src_spec: python-docker-pycreds.spec
+  dst_spec: saltbundlepy-docker-pycreds.spec
+  src_changes: python-docker-pycreds.changes
+  dst_changes: saltbundlepy-docker-pycreds.changes
+
+saltbundlepy-docopt:
+  src_name: python-docopt
+  src_spec: python-docopt.spec
+  dst_spec: saltbundlepy-docopt.spec
+  src_changes: python-docopt.changes
+  dst_changes: saltbundlepy-docopt.changes
+
+saltbundlepy-idna:
+  src_name: python-idna
+  src_spec: python-idna.spec
+  dst_spec: saltbundlepy-idna.spec
+  src_changes: python-idna.changes
+  dst_changes: saltbundlepy-idna.changes
+
+saltbundlepy-importlib-metadata:
+  src_name: python-importlib-metadata
+  src_spec: python-importlib-metadata.spec
+  dst_spec: saltbundlepy-importlib-metadata.spec
+  src_changes: python-importlib-metadata.changes
+  dst_changes: saltbundlepy-importlib-metadata.changes
+
+saltbundlepy-jinja2:
+  src_name: python-Jinja2
+  src_spec: python-Jinja2.spec
+  dst_spec: saltbundlepy-jinja2.spec
+  src_changes: python-Jinja2.changes
+  dst_changes: saltbundlepy-jinja2.changes
+
+saltbundlepy-kiwi:
+  src_name: python-kiwi
+  src_spec: python-kiwi.spec
+  dst_spec: saltbundlepy-kiwi.spec
+  src_changes: python-kiwi.changes
+  dst_changes: saltbundlepy-kiwi.changes
+
+saltbundlepy-libvirt:
+  src_name: python-libvirt-python
+  src_project: openSUSE:Factory
+  dst_project: systemsmanagement:saltstack:bundle:SLE15
+  src_spec: python-libvirt-python.spec
+  dst_spec: saltbundlepy-libvirt.spec
+  src_changes: python-libvirt-python.changes
+  dst_changes: saltbundlepy-libvirt.changes
+
+saltbundlepy-lxml:
+  src_name: python-lxml
+  src_project: openSUSE:Factory
+  src_spec: python-lxml.spec
+  dst_spec: saltbundlepy-lxml.spec
+  src_changes: python-lxml.changes
+  dst_changes: saltbundlepy-lxml.changes
+
+saltbundlepy-m2crypto:
+  src_name: python-M2Crypto
+  src_spec: python-M2Crypto.spec
+  dst_spec: saltbundlepy-m2crypto.spec
+  src_changes: python-M2Crypto.changes
+  dst_changes: saltbundlepy-m2crypto.changes
+
+saltbundlepy-markupsafe:
+  src_name: python-MarkupSafe
+  src_project: openSUSE:Factory
+  src_spec: python-MarkupSafe.spec
+  dst_spec: saltbundlepy-markupsafe.spec
+  src_changes: python-MarkupSafe.changes
+  dst_changes: saltbundlepy-markupsafe.changes
+
+saltbundlepy-more-itertools:
+  src_name: python-more-itertools
+  src_spec: python-more-itertools.spec
+  dst_spec: saltbundlepy-more-itertools.spec
+  src_changes: python-more-itertools.changes
+  dst_changes: saltbundlepy-more-itertools.changes
+
+saltbundlepy-msgpack:
+  src_name: python-msgpack
+  src_spec: python-msgpack.spec
+  dst_spec: saltbundlepy-msgpack.spec
+  src_changes: python-msgpack.changes
+  dst_changes: saltbundlepy-msgpack.changes
+
+saltbundlepy-netaddr:
+  src_name: python-netaddr
+  src_spec: python-netaddr.spec
+  dst_spec: saltbundlepy-netaddr.spec
+  src_changes: python-netaddr.changes
+  dst_changes: saltbundlepy-netaddr.changes
+
+saltbundlepy-packaging:
+  src_name: python-packaging
+  src_spec: python-packaging.spec
+  dst_spec: saltbundlepy-packaging.spec
+  src_changes: python-packaging.changes
+  dst_changes: saltbundlepy-packaging.changes
+
+saltbundlepy-paramiko:
+  src_name: python-paramiko
+  src_spec: python-paramiko.spec
+  dst_spec: saltbundlepy-paramiko.spec
+  src_changes: python-paramiko.changes
+  dst_changes: saltbundlepy-paramiko.changes
+
+saltbundlepy-pip:
+  src_name: python310-pip
+  src_spec: python310-pip.spec
+  dst_spec: saltbundlepy-pip.spec
+  src_changes: python310-pip.changes
+  dst_changes: saltbundlepy-pip.changes
+
+saltbundlepy-pluggy:
+  src_name: python-pluggy
+  src_spec: python-pluggy.spec
+  dst_spec: saltbundlepy-pluggy.spec
+  src_changes: python-pluggy.changes
+  dst_changes: saltbundlepy-pluggy.changes
+
+saltbundlepy-psutil:
+  src_name: python-psutil
+  src_spec: python-psutil.spec
+  dst_spec: saltbundlepy-psutil.spec
+  src_changes: python-psutil.changes
+  dst_changes: saltbundlepy-psutil.changes
+
+saltbundlepy-ptyprocess:
+  src_name: python-ptyprocess
+  src_spec: python-ptyprocess.spec
+  dst_spec: saltbundlepy-ptyprocess.spec
+  src_changes: python-ptyprocess.changes
+  dst_changes: saltbundlepy-ptyprocess.changes
+
+saltbundlepy-py:
+  src_name: python-py
+  src_spec: python-py.spec
+  dst_spec: saltbundlepy-py.spec
+  src_changes: python-py.changes
+  dst_changes: saltbundlepy-py.changes
+
+saltbundlepy-pyasn1:
+  src_name: python-pyasn1
+  src_spec: python-pyasn1.spec
+  dst_spec: saltbundlepy-pyasn1.spec
+  src_changes: python-pyasn1.changes
+  dst_changes: saltbundlepy-pyasn1.changes
+
+saltbundlepy-pyasn1-modules:
+  src_name: python-pyasn1-modules
+  src_spec: python-pyasn1-modules.spec
+  dst_spec: saltbundlepy-pyasn1-modules.spec
+  src_changes: python-pyasn1-modules.changes
+  dst_changes: saltbundlepy-pyasn1-modules.changes
+
+saltbundlepy-pycparser:
+  src_name: python-pycparser
+  src_spec: python-pycparser.spec
+  dst_spec: saltbundlepy-pycparser.spec
+  src_changes: python-pycparser.changes
+  dst_changes: saltbundlepy-pycparser.changes
+
+saltbundlepy-pycurl:
+  src_name: python-pycurl
+  src_spec: python-pycurl.spec
+  dst_spec: saltbundlepy-pycurl.spec
+  src_changes: python-pycurl.changes
+  dst_changes: saltbundlepy-pycurl.changes
+
+saltbundlepy-pyinotify:
+  src_name: python-pyinotify
+  src_spec: python-pyinotify.spec
+  dst_spec: saltbundlepy-pyinotify.spec
+  src_changes: python-pyinotify.changes
+  dst_changes: saltbundlepy-pyinotify.changes
+
+saltbundlepy-pynacl:
+  src_name: python-PyNaCl
+  src_spec: python-PyNaCl.spec
+  dst_spec: saltbundlepy-pynacl.spec
+  src_changes: python-PyNaCl.changes
+  dst_changes: saltbundlepy-pynacl.changes
+
+saltbundlepy-pyopenssl:
+  src_name: python-pyOpenSSL
+  src_spec: python-pyOpenSSL.spec
+  dst_spec: saltbundlepy-pyopenssl.spec
+  src_changes: python-pyOpenSSL.changes
+  dst_changes: saltbundlepy-pyopenssl.changes
+
+saltbundlepy-pyparsing:
+  src_name: python-pyparsing
+  src_spec: python-pyparsing.spec
+  dst_spec: saltbundlepy-pyparsing.spec
+  src_changes: python-pyparsing.changes
+  dst_changes: saltbundlepy-pyparsing.changes
+
+saltbundlepy-pysocks:
+  src_name: python-PySocks
+  src_spec: python-PySocks.spec
+  dst_spec: saltbundlepy-pysocks.spec
+  src_changes: python-PySocks.changes
+  dst_changes: saltbundlepy-pysocks.changes
+
+saltbundlepy-pytest:
+  src_name: python-pytest
+  src_spec: python-pytest.spec
+  dst_spec: saltbundlepy-pytest.spec
+  src_changes: python-pytest.changes
+  dst_changes: saltbundlepy-pytest.changes
+
+saltbundlepy-pytz:
+  src_name: python-pytz
+  src_spec: python-pytz.spec
+  dst_spec: saltbundlepy-pytz.spec
+  src_changes: python-pytz.changes
+  dst_changes: saltbundlepy-pytz.changes
+
+saltbundlepy-pyxattr:
+  src_name: python-pyxattr
+  src_project: openSUSE:Factory
+  src_spec: python-pyxattr.spec
+  dst_spec: saltbundlepy-pyxattr.spec
+  src_changes: python-pyxattr.changes
+  dst_changes: saltbundlepy-pyxattr.changes
+
+saltbundlepy-pyyaml:
+  src_name: python-PyYAML
+  src_spec: python-PyYAML.spec
+  dst_spec: saltbundlepy-pyyaml.spec
+  src_changes: python-PyYAML.changes
+  dst_changes: saltbundlepy-pyyaml.changes
+
+saltbundlepy-pyzmq:
+  src_name: python-pyzmq
+  src_project: openSUSE:Factory
+  src_spec: python-pyzmq.spec
+  dst_spec: saltbundlepy-pyzmq.spec
+  src_changes: python-pyzmq.changes
+  dst_changes: saltbundlepy-pyzmq.changes
+
+saltbundlepy-requests:
+  src_name: python-requests
+  src_spec: python-requests.spec
+  dst_spec: saltbundlepy-requests.spec
+  src_changes: python-requests.changes
+  dst_changes: saltbundlepy-requests.changes
+
+saltbundlepy-setuptools:
+  src_name: python310-setuptools
+  src_spec: python310-setuptools.spec
+  dst_spec: saltbundlepy-setuptools.spec
+  src_changes: python310-setuptools.changes
+  dst_changes: saltbundlepy-setuptools.changes
+
+saltbundlepy-setuptools-scm:
+  src_name: python-setuptools_scm
+  src_spec: python-setuptools_scm.spec
+  dst_spec: saltbundlepy-setuptools-scm.spec
+  src_changes: python-setuptools_scm.changes
+  dst_changes: saltbundlepy-setuptools-scm.changes
+
+saltbundlepy-simplejson:
+  src_name: python-simplejson
+  src_spec: python-simplejson.spec
+  dst_spec: saltbundlepy-simplejson.spec
+  src_changes: python-simplejson.changes
+  dst_changes: saltbundlepy-simplejson.changes
+
+saltbundlepy-six:
+  src_name: python-six
+  src_spec: python-six.spec
+  dst_spec: saltbundlepy-six.spec
+  src_changes: python-six.changes
+  dst_changes: saltbundlepy-six.changes
+
+saltbundlepy-tornado:
+  src_name: python-tornado
+  src_spec: python-tornado.spec
+  dst_spec: saltbundlepy-tornado.spec
+  src_changes: python-tornado.changes
+  dst_changes: saltbundlepy-tornado.changes
+
+saltbundlepy-urllib3:
+  src_name: python-urllib3
+  src_spec: python-urllib3.spec
+  dst_spec: saltbundlepy-urllib3.spec
+  src_changes: python-urllib3.changes
+  dst_changes: saltbundlepy-urllib3.changes
+
+saltbundlepy-websocket-client:
+  src_name: python-websocket-client
+  src_spec: python-websocket-client.spec
+  dst_spec: saltbundlepy-websocket-client.spec
+  src_changes: python-websocket-client.changes
+  dst_changes: saltbundlepy-websocket-client.changes
+
+saltbundlepy-wcwidth:
+  src_name: python-wcwidth
+  src_spec: python-wcwidth.spec
+  dst_spec: saltbundlepy-wcwidth.spec
+  src_changes: python-wcwidth.changes
+  dst_changes: saltbundlepy-wcwidth.changes
+
+saltbundlepy-zipp:
+  src_name: python-zipp
+  src_spec: python-zipp.spec
+  dst_spec: saltbundlepy-zipp.spec
+  src_changes: python-zipp.changes
+  dst_changes: saltbundlepy-zipp.changes
+
+saltbundlepy-zypp-plugin:
+  src_name: zypp-plugin
+  src_spec: zypp-plugin.spec
+  dst_spec: saltbundlepy-zypp-plugin.spec
+  src_changes: zypp-plugin.changes
+  dst_changes: saltbundlepy-zypp-plugin.changes

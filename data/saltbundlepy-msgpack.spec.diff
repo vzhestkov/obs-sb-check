@@ -1,0 +1,83 @@
+--- python-msgpack.spec
++++ saltbundlepy-msgpack.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-msgpack
++# spec file for package saltbundlepy-msgpack
+ #
+-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,36 +16,38 @@
+ #
+ 
+ 
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++%global debug_package %{nil}
++
+ %bcond_without test
+ 
+-%define oldpython python
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-msgpack
++Name:           saltbundlepy-msgpack
+ Version:        0.5.6
+ Release:        0
+ Summary:        MessagePack (de)serializer
+ License:        Apache-2.0
+ Group:          Development/Languages/Python
+-Url:            http://msgpack.org/
++URL:            http://msgpack.org/
+ Source:         https://files.pythonhosted.org/packages/source/m/msgpack/msgpack-%{version}.tar.gz
+-BuildRequires:  %{python_module Cython}
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
++Patch0:         fix_test_deprecations.patch
++BuildRequires:  %{saltbundlepy_module cython}
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+ BuildRequires:  gcc-c++
+-BuildRequires:  python-rpm-macros
+-# was renamed at 0.5.0
+-Provides:       python-msgpack-python = %{version}
+-Obsoletes:      python-msgpack-python < 0.5.0
+-%ifpython2
+-Provides:       %{oldpython}-msgpack-python = %{version}
+-Obsoletes:      %{oldpython}-msgpack-python < 0.5.0
+-%endif
++BuildRequires:  saltbundlepy-rpm-macros
+ %if %{with test}
+ # Test requirements:
+-BuildRequires:  %{python_module pytest}
++BuildRequires:  %{saltbundlepy_module pytest}
+ %endif
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
++Requires:       saltbundlepy-base
+ %python_subpackages
+ 
+ %description
+@@ -56,6 +58,7 @@
+ 
+ %prep
+ %setup -q -n msgpack-%{version}
++%autopatch -p1
+ 
+ %build
+ export CFLAGS="%{optflags}"
+@@ -77,6 +80,6 @@
+ %doc README.rst
+ %license COPYING
+ %{python_sitearch}/msgpack
+-%{python_sitearch}/msgpack-%{version}-py%{py_ver}.egg-info
++%{python_sitearch}/msgpack-%{version}-py*.egg-info
+ 
+ %changelog

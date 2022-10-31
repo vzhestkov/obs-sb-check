@@ -1,0 +1,72 @@
+--- python-more-itertools.spec
++++ saltbundlepy-more-itertools.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-more-itertools
++# spec file for package saltbundlepy-more-itertools
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,26 +16,40 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%define skip_python2 1
+-Name:           python-more-itertools
+-Version:        8.10.0
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-more-itertools
++Version:        4.2.0
+ Release:        0
+ Summary:        More routines for operating on iterables, beyond itertools
+ License:        MIT
+ Group:          Development/Languages/Python
+ URL:            https://github.com/erikrose/more-itertools
+ Source:         https://files.pythonhosted.org/packages/source/m/more-itertools/more-itertools-%{version}.tar.gz
+-BuildRequires:  %{python_module base}
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  %{saltbundlepy_module six}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-base
+ BuildArch:      noarch
+ %python_subpackages
+ 
+ %description
+-Additional building blocks, recipes, and routines for working with
+-Python iterables.
++I love itertools; it's one of the most beautiful, composable standard libs.
++Whenever I have an iteration problem, there's almost always an itertools
++routine that fits it perfectly. Sometimes, however, neither itertools nor the
++recipes included in its docs do quite what I need.
++
++Here I've collected several routines I've reached for but not found. Since
++they are deceptively tricky to get right, I've wrapped them up into a library.
++We've also included implementations of the recipes from the itertools
++documentation. Enjoy! Any additions are welcome; just file a pull request.
+ 
+ %prep
+ %setup -q -n more-itertools-%{version}
+@@ -46,10 +60,10 @@
+ 
+ %install
+ %python_install
+-%python_exec %fdupes %{buildroot}%{$python_sitelib}
++%python_exec %fdupes -s %{buildroot}%{$python_sitelib}
+ 
+ %check
+-%pyunittest discover -v
++%python_exec setup.py test
+ 
+ %files %{python_files}
+ %doc README.rst

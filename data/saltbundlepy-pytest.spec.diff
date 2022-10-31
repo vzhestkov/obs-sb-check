@@ -1,0 +1,145 @@
+--- python-pytest.spec
++++ saltbundlepy-pytest.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python
++# spec file for package saltbundlepy-pytest
+ #
+-# Copyright (c) 2020 SUSE LLC
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,62 +16,56 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
+ %global flavor @BUILD_FLAVOR@%{nil}
+ %if "%{flavor}" == "test"
+-%define psuffix -%{flavor}
++%define psuffix -test
+ %bcond_without test
+ %else
+ %define psuffix %{nil}
+ %bcond_with test
+ %endif
+-%define skip_python2 1
+-Name:           python-pytest%{psuffix}
++
++Name:           saltbundlepy-pytest%{psuffix}
+ Version:        5.4.3
+ Release:        0
+ Summary:        Python testing tool with autodiscovery and detailed asserts
+ License:        MIT
++Group:          Development/Languages/Python
+ URL:            https://github.com/pytest-dev/pytest
+ Source:         https://files.pythonhosted.org/packages/source/p/pytest/pytest-%{version}.tar.gz
+ Patch0:         tidy-up-embeddedfile.patch
+-BuildRequires:  %{python_module setuptools >= 40.0}
+-BuildRequires:  %{python_module setuptools_scm}
++Patch1:         fix-assertion-rewriting-on-python3.10.patch
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools >= 40.0}
++BuildRequires:  %{saltbundlepy_module setuptools-scm}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-Requires:       python-attrs >= 17.4.0
+-Requires:       python-importlib-metadata >= 0.12
+-Requires:       python-more-itertools >= 4.0.0
+-Requires:       python-packaging
+-Requires:       python-pluggy >= 0.12
+-Requires:       python-py >= 1.5.0
+-Requires:       python-setuptools
+-Requires:       python-wcwidth
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-atomicwrites >= 1.0
++Requires:       saltbundlepy-attrs >= 17.4.0
++Requires:       saltbundlepy-importlib-metadata >= 0.12
++Requires:       saltbundlepy-more-itertools >= 4.0.0
++Requires:       saltbundlepy-packaging
++Requires:       saltbundlepy-pluggy >= 0.12
++Requires:       saltbundlepy-py >= 1.5.0
++Requires:       saltbundlepy-setuptools
++Requires:       saltbundlepy-six >= 1.10.0
++Requires:       saltbundlepy-wcwidth
+ Requires(post): update-alternatives
+ Requires(postun): update-alternatives
+-Obsoletes:      python-pytest-doc
+ BuildArch:      noarch
+ %if %{with test}
+-BuildRequires:  %{python_module Jinja2}
+-BuildRequires:  %{python_module Twisted}
+-BuildRequires:  %{python_module decorator}
+-BuildRequires:  %{python_module hypothesis >= 3.56}
+-BuildRequires:  %{python_module importlib-metadata >= 0.12}
+-BuildRequires:  %{python_module mock}
+-# nose is really not REQUIRED, the test suite skips over particular
+-# tests, when the package is not available.
+-# BuildRequires:  %%{python_module nose}
+-BuildRequires:  %{python_module numpy}
+-BuildRequires:  %{python_module pexpect}
+-BuildRequires:  %{python_module pygments-pytest}
+-BuildRequires:  %{python_module pytest >= %{version}}
+-BuildRequires:  %{python_module pytest-forked}
+-BuildRequires:  %{python_module pytest-xdist}
+-BuildRequires:  %{python_module requests}
+-BuildRequires:  %{python_module xmlschema}
+-BuildRequires:  lsof
+-%endif
+-%if %{python3_version_nodots} < 36
+-Requires:       python-pathlib2 >= 2.2.0
++BuildRequires:  %{saltbundlepy_module hypothesis}
++BuildRequires:  %{saltbundlepy_module pytest >= %{version}}
++BuildRequires:  %{saltbundlepy_module setuptools_scm}
++BuildRequires:  saltbundlepy-funcsigs
++BuildRequires:  saltbundlepy-mock
+ %endif
+ %python_subpackages
+ 
+@@ -101,22 +95,15 @@
+ %python_clone -a %{buildroot}%{_bindir}/py.test
+ %python_clone -a %{buildroot}%{_bindir}/pytest
+ 
+-if [ -x %{buildroot}%{_bindir}/py.test-%{python2_bin_suffix} ]; then
+-    ln -s py.test-%{python2_bin_suffix} %{buildroot}%{_bindir}/py.test2
+-fi
+-if [ -x %{buildroot}%{_bindir}/py.test-%{python3_bin_suffix} ]; then
+-    ln -s py.test-%{python3_bin_suffix} %{buildroot}%{_bindir}/py.test3
+-fi
+-
+ %python_expand %fdupes %{buildroot}%{$python_sitelib}
+ %endif
+ 
++#Check here because in main package creates a buildcycle
+ %check
+ %if %{with test}
+ %pytest
+ %endif
+ 
+-%if ! %{with test}
+ %post
+ %{python_install_alternative py.test} \
+    --slave %{_bindir}/pytest pytest %{_bindir}/pytest-%{python_version}
+@@ -124,13 +111,12 @@
+ %postun
+ %python_uninstall_alternative py.test
+ 
++%if ! %{with test}
+ %files %{python_files}
+ %doc AUTHORS CHANGELOG.rst README.rst
+ %license LICENSE
+ %python_alternative %{_bindir}/py.test
+ %python_alternative %{_bindir}/pytest
+-%python2_only %{_bindir}/py.test2
+-%python3_only %{_bindir}/py.test3
+ %{python_sitelib}/*
+ %endif
+ 

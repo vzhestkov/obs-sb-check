@@ -1,0 +1,50 @@
+--- python-docker-pycreds.spec
++++ saltbundlepy-docker-pycreds.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-docker-pycreds
++# spec file for package saltbundlepy-docker-pycreds
+ #
+-# Copyright (c) 2019 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,8 +16,14 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-docker-pycreds
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-docker-pycreds
+ Version:        0.4.0
+ Release:        0
+ Summary:        Python bindings for the Docker credentials store API
+@@ -25,14 +31,13 @@
+ Group:          Development/Languages/Python
+ URL:            https://github.com/shin-/dockerpy-creds
+ Source:         https://files.pythonhosted.org/packages/source/d/docker-pycreds/docker-pycreds-%{version}.tar.gz
+-BuildRequires:  %{python_module pytest-cov}
+-BuildRequires:  %{python_module pytest}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  %{python_module six}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module pytest}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  %{saltbundlepy_module six}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-Requires:       python-six
+-Recommends:     docker-credential-secretservice
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-base
+ BuildArch:      noarch
+ %python_subpackages
+ 

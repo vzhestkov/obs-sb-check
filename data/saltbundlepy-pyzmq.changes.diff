@@ -1,0 +1,79 @@
+--- python-pyzmq.changes
++++ saltbundlepy-pyzmq.changes
+@@ -1,67 +1,13 @@
+ -------------------------------------------------------------------
+-Tue Jun 28 19:16:08 UTC 2022 - Ben Greiner <code@bnavigator.de>
+-
+-- Update to 23.2.0
+-  * Use zmq.Event enums in parse_monitor_message for nicer reprs
+-  * Fix building bundled libzmq with ZMQ_DRAFT_API=1
+-  * Fix subclassing zmq.Context with additional arguments in the
+-    constructor. Subclasses may now have full control over the
+-    signature, rather than purely adding keyword-only arguments
+-  * Typos and other small fixes
+-- Release 23.1.0
+-  * Fix global name of zmq.EVENT_HANDSHAKE_* constants
+-  * Fix constants missing when using import zmq.green as zmq
+-  * {func}zmq.utils.monitor.recv_monitor_msg now supports async
+-    Sockets.
+-- Release 23.0.0
+-  * all zmq constants are now available as Python enums (e.g.
+-    zmq.SocketType.PULL, zmq.SocketOption.IDENTITY), generated
+-    statically from zmq.h instead of at compile-time. This means
+-    that checks for the presence of a constant (hasattr(zmq,
+-    'RADIO')) is not a valid check for the presence of a feature.
+-    This practice has never been robust, but it may have worked
+-    sometimes. Use direct checks via e.g. {func}zmq.has or
+-    {func}zmq.zmq_version_info.
+-  * A bit more type coverage of Context.term and Context.socket
+-  * Remove all use of deprecated stdlib distutils
+-  * Update to Cython 0.29.30 (required for Python 3.11
+-    compatibility)
+-  * Compatibility with Python 3.11.0b1
+-  * Switch to myst for docs
+-  * Deprecate zmq.utils.strtypes, now unused
+-  * Updates to autoformatting, linting
+-- Drop less-flaky.patch: pytest-rerunfailures without the flaky
+-  package can handle it.
+-- Fix rpmlint errors
+-  * no-dependency-on python-base 3.X: depend on python(abi) = 3.X
+-  * unused-rpmlintrc-filter: Was unflavored, not required with the
+-    above -- drop rpmlintc
+-  * spurious-executable-perm: fix by chmod -x
+-  * obsolete-suse-version-check 1000. This package is not branched
+-    into any project for the maintenance of other distributions
+-
+--------------------------------------------------------------------
+-Wed Jan  5 23:03:59 UTC 2022 - Ben Greiner <code@bnavigator.de>
+-
+-- Skip test_log due to flaky socket handling inside obs environments.
+-- Add less-flaky.patch to increase flakiness of test_retry_poll
+-  and test_timeout.
+-
+--------------------------------------------------------------------
+-Wed Oct 13 13:26:41 UTC 2021 - Matej Cepl <mcepl@suse.com>
+-
+-- Update to 22.3.0:
+-  - Fix strlcpy compilation issues on alpine, freebsd. Adds new
+-    build-time dependency on packaging.
+-  - In event-loop integration: warn instead of raise when
+-    triggering callback on a socket whose context has been
+-    closed.
+-  - Bundled libzmq in wheels backport a patch to avoid crashes
+-    due to inappropriate closing of libsodium's random generator
+-    when using CurveZMQ.
+-  - New ResourceWarnings when contexts and sockets are closed by
+-    garbage collection, which can be a source of hangs and leaks
+-    (matches open files)
++Fri Jun 17 09:33:53 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Add explicit requrement for saltbundle-libzmq
++- Disable automatic dependency processing
++
++-------------------------------------------------------------------
++Mon Apr  4 13:02:24 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
+ 
+ -------------------------------------------------------------------
+ Wed Aug 11 10:15:01 UTC 2021 - Markéta Machová <mmachova@suse.com>

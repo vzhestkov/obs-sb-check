@@ -1,0 +1,11 @@
+--- python-pluggy.changes
++++ saltbundlepy-pluggy.changes
+@@ -1,3 +1,8 @@
++-------------------------------------------------------------------
++Mon Apr  4 12:48:40 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++
+ -------------------------------------------------------------------
+ Mon Jan  6 12:52:03 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
+ 

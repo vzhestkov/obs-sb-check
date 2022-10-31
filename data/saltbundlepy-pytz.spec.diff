@@ -1,0 +1,70 @@
+--- python-pytz.spec
++++ saltbundlepy-pytz.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-pytz
++# spec file for package saltbundlepy-pytz
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,19 +16,14 @@
+ #
+ 
+ 
+-# Ensure you update the tzdata_version for any minor version increase
+-# otherwise the update python library has the incorrect timezone data.
+-%define tzdata_version 2021a
+-%define oldpython python
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%{?!pyunittest:%define pyunittest(+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-=) \\\
+-    %{lua: local args = rpm.expand("%**");
+-           local broot = rpm.expand("%buildroot");
+-           local intro = "%{python_expand PYTHONPATH=${PYTHONPATH:+$PYTHONPATH:}" .. broot .. "%{$python_sitelib} PYTHONDONTWRITEBYTECODE=1 $python -m unittest ";
+-           print(rpm.expand(intro .. args .. "}"))
+-    } }
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
+ 
+-Name:           python-pytz
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-pytz
+ Version:        2021.1
+ Release:        0
+ Summary:        World timezone definitions, modern and historical
+@@ -42,17 +37,14 @@
+ Patch0:         fix-tests.patch
+ # PATCH-FIX-UPSTREAM 0001-Fix-tests-for-older-timezone-versions.patch -- https://code.launchpad.net/~toabctl/pytz/+git/pytz/+merge/326419
+ Patch2:         0001-Fix-tests-for-older-timezone-versions.patch
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-BuildRequires:  timezone >= %{tzdata_version}
+-Requires:       python-base
+-Requires:       timezone >= %{tzdata_version}
++BuildRequires:  saltbundlepy-rpm-macros
++BuildRequires:  timezone
++Requires:       saltbundlepy-base
++Requires:       timezone
+ BuildArch:      noarch
+-%ifpython2
+-Provides:       %{oldpython}-tz = %{version}
+-Obsoletes:      %{oldpython}-tz < %{version}
+-%endif
+ %python_subpackages
+ 
+ %description
+@@ -71,9 +63,6 @@
+ 
+ # For rpmlint warning: remove shebang from python library:
+ sed -i '/^#!/d' ./pytz/tzfile.py
+-
+-# Help Python 2.7 unittest
+-touch pytz/tests/__init__.py
+ 
+ %build
+ %python_build

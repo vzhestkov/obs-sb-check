@@ -1,0 +1,186 @@
+--- python-more-itertools.changes
++++ saltbundlepy-more-itertools.changes
+@@ -1,181 +1,7 @@
+ -------------------------------------------------------------------
+-Sat Oct 16 19:09:54 UTC 2021 - Dirk Müller <dmueller@suse.com>
++Mon Apr  4 12:43:54 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
+ 
+-- update to 8.10.0:
+-    * The type stub for :func:`iter_except` was improved (thanks to  MarcinKonowalczyk)
+-    *  Type stubs now ship with the source release (thanks to saaketp)
+-    *  The Sphinx docs were improved (thanks to MarcinKonowalczyk)
+-    * New functions
+-      * :func:`interleave_evenly` (thanks to mbugert)
+-      * :func:`repeat_each` (thanks to FinalSh4re)
+-      * :func:`chunked_even` (thanks to valtron)
+-      * :func:`map_if` (thanks to sassbalint)
+-      * :func:`zip_broadcast` (thanks to kalekundert)
+-    * Changes to existing functions
+-      * The type stub for :func:`chunked` was improved (thanks to  PhilMacKay)
+-      * The type stubs for :func:`zip_equal` and `zip_offset` were improved (thanks to maffoo)
+-      * Building Sphinx docs locally was improved (thanks to MarcinKonowalczyk) 
+-
+--------------------------------------------------------------------
+-Sun Jun  6 12:43:51 UTC 2021 - Dirk Müller <dmueller@suse.com>
+-
+-- update to 8.8.0:
+-  * :func:`countable` (thanks to krzysieq)
+-  * :func:`split_before` was updated to handle empy collections (thanks to TiunovNN)
+-  * :func:`unique_everseen` got a performance boost (thanks to Numerlor)
+-  * The type hint for :func:`value_chain` was corrected (thanks to vr2262)
+-
+--------------------------------------------------------------------
+-Thu Jun  3 11:51:31 UTC 2021 - pgajdos@suse.com
+-
+-- %check: use %pyunittest rpm macro
+-
+--------------------------------------------------------------------
+-Thu Mar  4 21:03:34 UTC 2021 - Dirk Müller <dmueller@suse.com>
+-
+-- update to 8.7.0:
+-  * New functions
+-    * :func:`convolve`
+-    * :func:`product_index`, :func:`combination_index`, and :func:`permutation_index`
+-    * :func:`value_chain`
+-  * Changes to existing functions
+-    * :func:`distinct_combinations` now uses a non-recursive algorithm
+-    * :func:`pad_none` is now the preferred name for :func:`padnone`, though the latter remains available.
+-    * :func:`pairwise` will now use the Python standard library implementation on Python 3.10+
+-    * :func:`sort_together` now accepts a ``key`` argument
+-    * :func:`seekable` now has a ``peek`` method, and can indicate whether the iterator it's wrapping is exhausted
+-    * :func:`time_limited` can now indicate whether its iterator has expired
+-    * The implementation of :func:`unique_everseen` was improved
+-  * Other changes:
+-    * Various documentation updates
+-
+--------------------------------------------------------------------
+-Sat Dec 19 10:51:38 UTC 2020 - Dirk Müller <dmueller@suse.com>
+-
+-- update to 8.6.0:
+-  * :func:`all_unique` (thanks to brianmaissy)
+-  * :func:`nth_product` and :func:`nth_permutation` (thanks to N8Brooks)
+-  * :func:`chunked` and :func:`sliced` now accept a ``strict`` parameter (thanks to shlomif and jtwool)
+-  * Python 3.5 has reached its end of life and is no longer supported.
+-  * Python 3.9 is officially supported.
+-
+--------------------------------------------------------------------
+-Wed Sep 16 11:13:30 UTC 2020 - Dirk Mueller <dmueller@suse.com>
+-
+-- update to 8.5.0:
+-  * windowed_complete() (thanks to MarcinKonowalczyk)
+-  Changes to existing itertools:
+-  * The is_sorted() implementation was improved (thanks to cool-RR)
+-  * The groupby_transform() now accepts a reducefunc parameter.
+-  * The last() implementation was improved (thanks to brianmaissy)
+-  * Various documentation fixes (thanks to craigrosie, samuelstjean, PiCT0)
+-  * The tests for distinct_combinations() were improved (thanks to Minabsapi)
+-
+--------------------------------------------------------------------
+-Thu Aug  6 08:16:47 UTC 2020 - Dirk Mueller <dmueller@suse.com>
+-
+-- update to 8.4.0:
+- * New itertools
+- * :func:`mark_ends` (thanks to kalekundert)
+- * :func:`is_sorted`
+- * Changes to existing itertools:
+-   * :func:`islice_extended` can now be used with real slices (thanks to cool-RR)
+-   * The implementations for :func:`filter_except` and :func:`map_except` were improved (thanks to SergBobrovsky)
+- * Other changes
+-   * Automated tests now enforce code style (using `black <https://github.com/psf/black>`__)
+-   * The various signatures of :func:`islice_extended` and :func:`numeric_range` now appear in the docs (thanks to dsfulf)
+-   * The test configuration for mypy was updated (thanks to blueyed)
+-
+--------------------------------------------------------------------
+-Tue Jun  2 16:30:25 UTC 2020 - Dirk Mueller <dmueller@suse.com>
+-
+-- update to 8.3.0:
+-  * New itertools
+-    * :func:`zip_equal` (thanks to frankier and alexmojaki)
+-    * :func:`split_at`, :func:`split_before`, :func:`split_after`, and :func:`split_when` all got a ``maxsplit`` paramter (thanks to jferard and ilai-deutel)
+-    * :func:`split_at` now accepts a ``keep_separator`` parameter (thanks to jferard)
+-    * :func:`distinct_permutations` can now generate ``r``-length permutations (thanks to SergBobrovsky and ilai-deutel)
+-    * The :func:`windowed` implementation was improved  (thanks to SergBobrovsky)
+-    * The :func:`spy` implementation was improved (thanks to has2k1)
+-    * Type stubs are now tested with ``stubtest`` (thankjs to ilai-deutel)
+-    * Tests now run with ``python -m unittest`` instead of ``python setup.py test`` (thanks to jdufresne)
+-
+--------------------------------------------------------------------
+-Fri Feb 28 21:37:22 UTC 2020 - Dirk Mueller <dmueller@suse.com>
+-
+-- update to 8.2.0:
+-   * The .pyi files for typing were updated. (thanks to blueyed and ilai-deutel)
+-   * :func:`numeric_range` now behaves more like the built-in :func:`range`. (thanks to jferard)
+-   * :func:`bucket` now allows for enumerating keys. (thanks to alexchandel)
+-   * :func:`sliced` now should now work for numpy arrays. (thanks to sswingle)
+-   * :func:`seekable` now has a ``maxlen`` parameter.
+-
+--------------------------------------------------------------------
+-Wed Jan 22 15:56:53 UTC 2020 - Martin Sirringhaus <martin.sirringhaus@suse.com>
+-
+-- update to 8.1.0:
+-    * Bug fixes
+-        :func:`partition` works with pred=None again. (thanks 
+-        to MSeifert04)
+-    * New itertools
+-        :func:`sample` (thanks to tommyod)
+-        :func:`nth_or_last` (thanks to d-ryzhikov)
+-    * Changes to existing itertools:
+-        The implementation for :func:`divide` was improved.  
+-
+--------------------------------------------------------------------
+-Fri Dec 20 19:18:54 UTC 2019 - Dirk Mueller <dmueller@suse.com>
+-
+-- update to 8.0.2:
+-  * Bug fixes
+-      * The type stub files are now part of the wheel distribution (thanks to keisheiled)
+-      * The type stub files now work for functions imported from the
+-        root package (thanks to keisheiled)
+-  * New itertools and other additions
+-      * This library now ships type hints for use with mypy.
+-        (thanks to ilai-deutel for the implementation, and to gabbard and fmagin for assistance)
+-      * :func:`split_when` (thanks to jferard)
+-      * :func:`repeat_last` (thanks to d-ryzhikov)
+-  * Changes to existing itertools:
+-      * The implementation for :func:`set_partitions` was improved. (thanks to jferard)
+-      * :func:`partition` was optimized for expensive predicates. (thanks to stevecj)
+-      * :func:`unique_everseen` and :func:`groupby_transform` were re-factored. (thanks to SergBobrovsky)
+-      * The implementation for :func:`difference` was improved. (thanks to Jabbey92)
+-
+--------------------------------------------------------------------
+-Thu Aug 29 15:01:51 UTC 2019 - Jan Engelhardt <jengelh@inai.de>
+-
+-- Place a mildly useful text in the %description section.
+-
+--------------------------------------------------------------------
+-Tue Aug 27 12:15:12 UTC 2019 - Marketa Calabkova <mcalabkova@suse.com>
+-
+-- update to version 7.2.0
+-  * new itertools: distinct_combinations, set_partitions, filter_except,
+-    map_except, ichunked, only, time_limited, partitions, substrings_indexes
+-  * Python 2.7 is no longer supported. All future releases will target 
+-    the active versions of Python 3.
+-  * The six library is no longer a dependency.
+-  * collapse now treats bytes objects the same as str objects.
+-  * numeric_range now supports ranges specified by datetime.datetime 
+-    and datetime.timedelta objects
+-
+--------------------------------------------------------------------
+-Fri May 24 12:20:33 UTC 2019 - Marketa Calabkova <mcalabkova@suse.com>
+-
+-- update to version 5.0.0
+-  * new itertools: split_into, unzip, substrings
+-  * first_true now returns None by default.
+-  * Some code for old Python versions was removed
+-  * Tests now run properly on 32-bit versions of Python
+-  * Newer versions of CPython and PyPy are now tested against
+-  4.3.0
+-  * new itertools: last, replace, rlocate
+-  * locate can now search for multiple items
+-  * The docs now include a nice table of tools
+-
+-- There are newer versions of more-itertools but this is the last 
+-  version which supports Python 2.7
++- Strictly require Python 3.10 with saltbundlepy requrement
+ 
+ -------------------------------------------------------------------
+ Thu May 31 04:34:12 UTC 2018 - toddrme2178@gmail.com

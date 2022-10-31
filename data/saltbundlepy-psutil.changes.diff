@@ -1,0 +1,28 @@
+--- python-psutil.changes
++++ saltbundlepy-psutil.changes
+@@ -1,3 +1,25 @@
++-------------------------------------------------------------------
++Mon Apr  4 11:51:03 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++
++-------------------------------------------------------------------
++Tue Feb 15 15:00:24 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Skip randomly failing tests.test_contracts.TestFetchAllProcesses.test_all
++  in OBS
++
++- Added:
++  * skip-obs-test_contracts-TestFetchAllProcesses.test_all.patch
++
++-------------------------------------------------------------------
++Thu Feb  3 11:48:59 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Skip test randomly failing in OBS
++
++- Added:
++  * skip-obs-test_method_2.patch 
++
+ -------------------------------------------------------------------
+ Fri Jan 29 08:19:00 UTC 2021 - Antonio Larrosa <alarrosa@suse.com>
+ 

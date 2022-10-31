@@ -1,0 +1,46 @@
+--- python-simplejson.spec
++++ saltbundlepy-simplejson.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-simplejson
++# spec file for package saltbundlepy-simplejson
+ #
+-# Copyright (c) 2020 SUSE LLC
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,8 +16,14 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-simplejson
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-simplejson
+ Version:        3.17.2
+ Release:        0
+ Summary:        Extensible JSON encoder/decoder for Python
+@@ -25,11 +31,12 @@
+ Group:          Development/Languages/Python
+ URL:            https://github.com/simplejson/simplejson
+ Source:         https://files.pythonhosted.org/packages/source/s/simplejson/simplejson-%{version}.tar.gz
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module pytest}
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module pytest}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-base
+ %python_subpackages
+ 
+ %description

@@ -1,0 +1,134 @@
+--- python-cryptography.spec
++++ saltbundlepy-cryptography.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-cryptography
++# spec file for package saltbundlepy-cryptography
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,10 +16,17 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%bcond_without python2
+-Name:           python-cryptography
+-Version:        3.3.2
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++%bcond_with     test
++
++Name:           saltbundlepy-cryptography
++Version:        2.8
+ Release:        0
+ Summary:        Python library which exposes cryptographic recipes and primitives
+ License:        Apache-2.0 OR BSD-3-Clause
+@@ -31,48 +38,51 @@
+ # PATCH-FIX-SLE disable-uneven-sizes-tests.patch bnc#944204
+ Patch1:         disable-uneven-sizes-tests.patch
+ Patch2:         skip_openssl_memleak_test.patch
+-BuildRequires:  %{python_module asn1crypto >= 0.21.0}
+-BuildRequires:  %{python_module cffi >= 1.7}
+-BuildRequires:  %{python_module cryptography-vectors = %{version}}
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module idna >= 2.1}
+-BuildRequires:  %{python_module pyasn1-modules}
+-BuildRequires:  %{python_module pytz}
+-BuildRequires:  %{python_module setuptools >= 11.3}
+-BuildRequires:  %{python_module six >= 1.4.1}
++# PATCH-FIX-UPSTREAM 5507-mitigate-Bleichenbacher-attacks.patch bsc#1178168 mcepl@suse.com
++# Attempts to mitigate Bleichenbacher attacks on RSA decryption (CVE-2020-25659)
++Patch3:         5507-mitigate-Bleichenbacher-attacks.patch
++# PATCH-FIX-UPSTREAM bsc#1182066
++Patch4:         CVE-2020-36242-buffer-overflow.patch
++%if 0%{?ubuntu} >= 2204 || 0%{?rhel} >= 9
++# Drop supported for older LibreSSL as it's missing on Ubuntu 22.04
++Patch5:         drop-older-libressl.patch
++%endif
++BuildRequires:  %{saltbundlepy_module asn1crypto >= 0.21.0}
++BuildRequires:  %{saltbundlepy_module cffi >= 1.7}
++BuildRequires:  %{saltbundlepy_module cryptography-vectors >= 2.8}
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module idna >= 2.1}
++BuildRequires:  %{saltbundlepy_module pyasn1-modules}
++BuildRequires:  %{saltbundlepy_module pytz}
++BuildRequires:  %{saltbundlepy_module setuptools >= 11.3}
++BuildRequires:  %{saltbundlepy_module six >= 1.4.1}
+ BuildRequires:  fdupes
++%if 0%{?suse_version} == 1315
++BuildRequires:  saltbundle-libopenssl-devel
++%else
+ BuildRequires:  libopenssl-devel
++%endif
+ BuildRequires:  pkgconfig
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildRequires:  pkgconfig(libffi)
+-Requires:       python-asn1crypto >= 0.21.0
+-Recommends:     python-idna >= 2.1
+-Requires:       python-packaging
+-Requires:       python-pyasn1 >= 0.1.8
+-Requires:       python-setuptools >= 11.3
+-Requires:       python-six >= 1.4.1
+-%requires_eq    python-cffi
+-%if %{with python2}
+-BuildRequires:  python2-enum34
+-BuildRequires:  python2-ipaddress
+-%endif
++Requires:       saltbundlepy-asn1crypto >= 0.21.0
++Requires:       saltbundlepy-cffi >= 1.7
++Requires:       saltbundlepy-idna >= 2.1
++Requires:       saltbundlepy-packaging
++Requires:       saltbundlepy-pyasn1 >= 0.1.8
++Requires:       saltbundlepy-setuptools >= 11.3
++Requires:       saltbundlepy-six >= 1.4.1
+ # SECTION Test requirements
++%if %{with test}
+ BuildRequires:  %{python_module hypothesis >= 1.11.4}
+ BuildRequires:  %{python_module iso8601}
+ BuildRequires:  %{python_module packaging}
+ BuildRequires:  %{python_module pretend}
+ BuildRequires:  %{python_module pyasn1 >= 0.1.8}
+ BuildRequires:  %{python_module pytest > 3.3.0}
++BuildRequires:  %{python_module virtualenv}
++%endif
+ # /SECTION
+-# python-base is not enough, we need the _ssl module
+-%ifpython2
+-Requires:       python-enum34
+-Requires:       python-ipaddress
+-Requires:       python2
+-%endif
+-%ifpython3
+-Requires:       python3
+-%endif
+ %python_subpackages
+ 
+ %description
+@@ -88,8 +98,7 @@
+ 
+ %prep
+ %setup -q -n cryptography-%{version}
+-%patch1 -p1
+-%patch2 -p1
++%autopatch -p1
+ 
+ %build
+ export CFLAGS="%{optflags} -fno-strict-aliasing"
+@@ -103,8 +112,10 @@
+ %python_install
+ %python_expand %fdupes %{buildroot}%{$python_sitearch}
+ 
++%if %{with test}
+ %check
+ %pytest_arch
++%endif
+ 
+ %files %{python_files}
+ %license LICENSE LICENSE.APACHE LICENSE.BSD

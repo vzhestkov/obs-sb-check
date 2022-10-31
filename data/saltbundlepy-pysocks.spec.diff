@@ -1,0 +1,66 @@
+--- python-PySocks.spec
++++ saltbundlepy-pysocks.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-PySocks
++# spec file for package saltbundlepy-pysocks
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ # Copyright (c) 2016 LISA GmbH, Bingen, Germany.
+ #
+ # All modifications and additions to the file contributed by third parties
+@@ -13,30 +13,32 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%define oldpython python
+-Name:           python-PySocks
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-pysocks
+ Version:        1.6.8
+ Release:        0
+ Summary:        A Python SOCKS client module
+ License:        BSD-3-Clause
+ Group:          Development/Languages/Python
+-Url:            https://github.com/Anorov/PySocks
++URL:            https://github.com/Anorov/PySocks
+ Source:         https://files.pythonhosted.org/packages/source/P/PySocks/PySocks-%{version}.tar.gz
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  python-rpm-macros
+-%ifpython2
+-Provides:       %{oldpython}-SocksiPy = %{version}
+-Obsoletes:      %{oldpython}-SocksiPy < %{version}
+-%endif
++Patch1:         fix-deprecated-collections.patch
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+ BuildArch:      noarch
+-
++Requires:       saltbundlepy-base
+ %python_subpackages
+ 
+ %description
+@@ -49,6 +51,7 @@
+ 
+ %prep
+ %setup -q -n PySocks-%{version}
++%autopatch -p1
+ 
+ %build
+ %python_build

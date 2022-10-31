@@ -1,0 +1,11 @@
+--- python-six.changes
++++ saltbundlepy-six.changes
+@@ -1,3 +1,8 @@
++-------------------------------------------------------------------
++Mon Apr  4 13:06:35 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++
+ -------------------------------------------------------------------
+ Tue Mar 10 07:53:50 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
+ 

@@ -1,0 +1,19 @@
+--- python-PySocks.changes
++++ saltbundlepy-pysocks.changes
+@@ -1,3 +1,16 @@
++-------------------------------------------------------------------
++Mon Apr  4 12:58:01 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++
++-------------------------------------------------------------------
++Fri Oct 22 12:55:55 UTC 2021 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Stop using deprecated collections module
++
++- Added:
++  * fix-deprecated-collections.patch
++
+ -------------------------------------------------------------------
+ Thu Dec 21 18:26:53 UTC 2017 - arun@gmx.de
+ 

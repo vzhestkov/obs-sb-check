@@ -1,0 +1,239 @@
+#!/usr/bin/python3
+
+import difflib
+import io
+import hashlib
+import re
+import sys
+import urllib
+import yaml
+
+from contextlib import redirect_stdout
+from osc import commandline as osc_mod
+
+
+data = {}
+
+default = {}
+
+cookie_data = {}
+
+
+def getPkgData(pkg):
+    global data
+    global default
+    if pkg not in data:
+        return None
+    ret = {}
+    for attr in (
+        "src_name",
+        "src_project",
+        "dst_project",
+        "src_spec",
+        "dst_spec",
+        "src_changes",
+        "dst_changes",
+    ):
+        if attr in default:
+            ret[attr] = default[attr]
+        if attr in data[pkg]:
+            ret[attr] = data[pkg][attr]
+    ret["dst_name"] = pkg
+    return ret
+
+
+def getOBSFilesDiff(
+    src_project,
+    src_package,
+    src_file,
+    dst_project,
+    dst_package,
+    dst_file,
+    rev_only=False,
+    src_rev=None,
+    dst_rev=None,
+    diff_list=False,
+):
+    global apiurl
+
+    try:
+        src_rev = src_rev or osc_mod.show_upstream_srcmd5(
+            apiurl, src_project, src_package, expand=True
+        )
+    except urllib.error.HTTPError:
+        raise Exception(
+            "Unable to retrive file: %s:%s:%s" % (apiurl, src_project, src_package)
+        )
+    try:
+        dst_rev = dst_rev or osc_mod.show_upstream_srcmd5(
+            apiurl, dst_project, dst_package, expand=True
+        )
+    except urllib.error.HTTPError:
+        raise Exception(
+            "Unable to retrive file: %s:%s:%s" % (apiurl, dst_project, dst_package)
+        )
+    if rev_only:
+        return src_rev, dst_rev, None
+
+    diff = None
+
+    src_url = osc_mod.makeurl(
+        apiurl,
+        ["source", src_project, src_package, src_file],
+        query={"rev": src_rev},
+    )
+    try:
+        src_dt = [i.decode() for i in osc_mod.http_GET(src_url).readlines()]
+    except urllib.error.HTTPError:
+        raise Exception("Unable to retrive file: %s" % src_url)
+
+    dst_url = osc_mod.makeurl(
+        apiurl,
+        ["source", dst_project, dst_package, dst_file],
+        query={"rev": dst_rev},
+    )
+    try:
+        dst_dt = [i.decode() for i in osc_mod.http_GET(dst_url).readlines()]
+    except urllib.error.HTTPError:
+        raise Exception("Unable to retrive file: %s" % dst_url)
+
+    diff = list(difflib.unified_diff(src_dt, dst_dt, src_file, dst_file))
+    if not diff_list:
+        diff = "".join(diff)
+
+    return src_rev, dst_rev, diff
+
+
+def print_color_diff(diff):
+    re_hdr = re.compile("^(\-{3}|\+{3})", flags=re.MULTILINE)
+    diff = re_hdr.sub("\33[97m{}".format(r"\1"), diff)
+    re_plus = re.compile("^\+", flags=re.MULTILINE)
+    diff = re_plus.sub("\33[32m+", diff)
+    re_minus = re.compile("^\-", flags=re.MULTILINE)
+    diff = re_minus.sub("\33[31m-", diff)
+    re_at = re.compile("^\@@(.*)@@", flags=re.MULTILINE)
+    diff = re_at.sub("\33[36m@@{}@@\33[0m".format(r"\1"), diff)
+    re_lend = re.compile("$", flags=re.MULTILINE)
+    diff = re_lend.sub("\33[0m ", diff)
+    print(diff)
+
+
+def checkPkgsDiff(pkg_data):
+    global cookie_data
+    r = 0
+    (src_rev, dst_rev, _) = getOBSFilesDiff(
+        pkg_data["src_project"],
+        pkg_data["src_name"],
+        pkg_data["src_spec"],
+        pkg_data["dst_project"],
+        pkg_data["dst_name"],
+        pkg_data["dst_spec"],
+        rev_only=True,
+    )
+    store_diff = False
+    if pkg_data["dst_name"] not in cookie_data:
+        cookie_data[pkg_data["dst_name"]] = {
+            "src_revision": src_rev,
+            "dst_revision": dst_rev,
+        }
+        store_diff = True
+    elif src_rev != cookie_data[pkg_data["dst_name"]].get(
+        "src_revision"
+    ) or dst_rev != cookie_data[pkg_data["dst_name"]].get("dst_revision"):
+        for pkg_file in ("spec", "changes"):
+            file_hash = "{}_hash".format(pkg_file)
+            (_, _, diff) = getOBSFilesDiff(
+                pkg_data["src_project"],
+                pkg_data["src_name"],
+                pkg_data["src_{}".format(pkg_file)],
+                pkg_data["dst_project"],
+                pkg_data["dst_name"],
+                pkg_data["dst_{}".format(pkg_file)],
+                src_rev=src_rev,
+                dst_rev=dst_rev,
+                diff_list=True,
+            )
+            dg = hashlib.sha256()
+            dg.update("".join(diff).encode())
+            if (
+                file_hash in cookie_data[pkg_data["dst_name"]]
+                and cookie_data[pkg_data["dst_name"]][file_hash] != dg.hexdigest()
+            ):
+                dst_file = "{}.{}.diff".format(pkg_data["dst_name"], pkg_file)
+                with open("data/{}".format(dst_file)) as f:
+                    ddiff = "".join(
+                        difflib.unified_diff(
+                            f.readlines(),
+                            diff,
+                            "{}.old".format(dst_file),
+                            "{}.new".format(dst_file),
+                        )
+                    )
+                    print_color_diff(ddiff)
+                    r = 1
+        # store_diff = True
+    if store_diff:
+        for pkg_file in ("spec", "changes"):
+            (_, _, diff) = getOBSFilesDiff(
+                pkg_data["src_project"],
+                pkg_data["src_name"],
+                pkg_data["src_{}".format(pkg_file)],
+                pkg_data["dst_project"],
+                pkg_data["dst_name"],
+                pkg_data["dst_{}".format(pkg_file)],
+                src_rev=src_rev,
+                dst_rev=dst_rev,
+            )
+            dg = hashlib.sha256()
+            dg.update(diff.encode())
+            cookie_data[pkg_data["dst_name"]][
+                "{}_hash".format(pkg_file)
+            ] = dg.hexdigest()
+            with open(
+                "data/{}.{}.diff".format(pkg_data["dst_name"], pkg_file), "w"
+            ) as fd:
+                fd.write(diff)
+    return r
+
+
+OBS_CHECK_CONFIG = "obs-saltbundle.yml"
+OBS_PKGS_COOKIE = "data/cookie.yml"
+
+with open(OBS_CHECK_CONFIG) as f:
+    data = yaml.load(f, Loader=yaml.SafeLoader)
+    if "__DEFAULT__" in data:
+        default = data["__DEFAULT__"]
+        del data["__DEFAULT__"]
+
+try:
+    with open(OBS_PKGS_COOKIE) as f:
+        cookie_data = yaml.load(f, Loader=yaml.SafeLoader)
+except FileNotFoundError:
+    pass
+
+osc = osc_mod.Osc()
+osc_mod.conf.get_config()
+apiurl = osc.get_api_url()
+query = {}
+
+max_nlen = max([len(pkg) for pkg in data]) + 10
+
+for pkg in data:
+    pkg_data = getPkgData(pkg)
+    sout = None
+    with redirect_stdout(io.StringIO()) as f:
+        r = checkPkgsDiff(pkg_data)
+        sout = f.getvalue()
+    print(
+        "Checking \33[97m{}\33[0m {} [{}]".format(
+            pkg,
+            "." * (max_nlen - len(pkg)),
+            "\33[92m OK \33[0m" if r == 0 else "\33[93mDIFF\33[0m",
+        )
+    )
+    if r == 1:
+        print(sout)
+
+
+with open(OBS_PKGS_COOKIE, "w") as f:
+    yaml.dump(cookie_data, f)

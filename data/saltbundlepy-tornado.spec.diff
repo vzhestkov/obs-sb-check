@@ -1,0 +1,114 @@
+--- python-tornado.spec
++++ saltbundlepy-tornado.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-tornado
++# spec file for package saltbundlepy-tornado
+ #
+-# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,57 +12,42 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%bcond_without python2
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-tornado
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-tornado
+ Version:        4.5.3
+ Release:        0
+ Summary:        Open source version of scalable, non-blocking web server that power FriendFeed
+ License:        Apache-2.0
+ Group:          Development/Languages/Python
+-Url:            http://www.tornadoweb.org
++URL:            http://www.tornadoweb.org
+ Source:         https://files.pythonhosted.org/packages/source/t/tornado/tornado-%{version}.tar.gz
+ Patch0:         tornado-async-deprecations.patch
+ Patch1:         tornado-testsuite_timeout.patch
+ Patch2:         tornado-skip-failing-tests.patch
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module pycurl}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  %{python_module simplejson}
++Patch3:         test_asyncio.ensure_future_fix.patch
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module pycurl}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  %{saltbundlepy_module simplejson}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-Requires:       python
+-Requires:       python-simplejson
+-%if 0%{?suse_version} >= 1000 || 0%{?fedora_version} >= 24
+-Recommends:     python-Twisted
+-Recommends:     python-pycares
+-Recommends:     python-pycurl
+-Recommends:     python-service_identity
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy
++Requires:       saltbundlepy-simplejson
++# SECTION test requirements
++%if %{with tests}
++BuildRequires:  %{saltbundlepy_module backports_abc}
+ %endif
+-%if 0%{?sle_version} == 120000 && !0%{?is_opensuse}
+-BuildRequires:  %{python_module backports.ssl_match_hostname}
+-BuildRequires:  %{python_module certifi}
+-%endif
+-%if %{with python2}
+-BuildRequires:  python-futures
+-BuildRequires:  python-singledispatch
+-%endif
+-# SECTION test requirements
+-BuildRequires:  %{python_module backports_abc}
+ # /SECTION
+-%if %{python_version_nodots} < 35
+-Requires:       python-backports_abc
+-%endif
+-%ifpython2
+-Requires:       python-singledispatch
+-%if 0%{?suse_version} >= 1000 || 0%{?fedora_version} >= 24
+-Recommends:     python-futures
+-%endif
+-%endif
+ %python_subpackages
+ 
+ %description
+@@ -85,9 +70,7 @@
+ %setup -q -n tornado-%{version}
+ # Fix non-executable script rpmlint issue:
+ find demos tornado -name "*.py" -exec sed -i "/#\!\/usr\/bin\/.*/d" {} \;
+-%patch0 -p1
+-%patch1 -p1
+-%patch2 -p1
++%autopatch -p1
+ 
+ %pre
+ # remove egg-info _file_, being replaced by an egg-info directory
+@@ -103,9 +86,11 @@
+ %fdupes -s demos
+ %python_expand %fdupes %{buildroot}%{python_sitearch}
+ 
++%if %{with tests}
+ %check
+ export ASYNC_TEST_TIMEOUT=30
+ %python_exec -m tornado.test.runtests
++%endif
+ 
+ %files %{python_files}
+ %doc demos LICENSE

@@ -1,0 +1,329 @@
+--- python-M2Crypto.changes
++++ saltbundlepy-m2crypto.changes
+@@ -1,227 +1,85 @@
+ -------------------------------------------------------------------
+-Thu Apr  7 15:45:07 UTC 2022 - Matej Cepl <mcepl@suse.com>
+-
+-- Add missing bug references to this changelog.
+-
+--------------------------------------------------------------------
+-Mon Jun 14 21:04:54 UTC 2021 - Matej Cepl <mcepl@suse.com>
+-
+-- Update to 0.38.0:
+-    - Remove the last use of setup.py test idiom.
+-    - Use m2_PyObject_AsReadBuffer instead of PyObject_AsReadBuffer.
+-    - Add support for arm64 big endian <Steev Klimaszewski>
+-    - Make support of RSA_SSLV23_PADDING optional (it has been deprecated).
+-    - Move project to src/ layout
+-    - Allow verify_cb_* to be called with ok=True  <Casey Deccio>
+-    - Be prepared if any of constants in x509_vfy.h is not available.
+-    - But we do support 3.8
+-    - We DO NOT support Python 2.6.
+-- All patches were upstreamed:
+-    - 293_sslv23_padding.patch
+-    - no-need-parameterized.patch
+-    - python-M2Crypto-Allow-on-UNABLE_TO_VERIFY_LEAF_SIGNATURE.patch
+-
+--------------------------------------------------------------------
+-Thu Apr 22 22:33:46 UTC 2021 - Matej Cepl <mcepl@suse.com>
+-
+-- Add no-need-parameterized.patch ... we don't need run-time requirement
+-  of parameterized package (bsc#1185150).
+-
+--------------------------------------------------------------------
+-Fri Feb 19 12:56:50 UTC 2021 - Matej Cepl <mcepl@suse.com>
+-
+-- Add 293_sslv23_padding.patch to avoid using RSA_SSLV23_PADDING
+-  (gl#m2crypto/m2crypto#293, gh#openssl/openssl#14216).
+-
+--------------------------------------------------------------------
+-Wed Feb 17 11:18:07 UTC 2021 - Pedro Monreal <pmonreal@suse.com>
+-
+-- OpenSSL allows the verificaton to continue on
+-  UNABLE_TO_VERIFY_LEAF_SIGNATURE
+-  * This unifies the behaviour of a single certificate with an
+-    unknown CA certificate with a self-signed certificate.
+-- Add python-M2Crypto-Allow-on-UNABLE_TO_VERIFY_LEAF_SIGNATURE.patch
+-  (Thanks for Debian,
+-  https://salsa.debian.org/python-team/packages/m2crypto/-/commit/e0e9ad5cfff8)
+-
+--------------------------------------------------------------------
+-Wed Feb 17 10:57:56 UTC 2021 - Pedro Monreal <pmonreal@suse.com>
+-
+-- Add source signature file
+-
+--------------------------------------------------------------------
+-Wed Jan 13 08:16:04 UTC 2021 - Matej Cepl <mcepl@suse.com>
+-
+-- Dr. Strangelove or: How I Learned to Stop Worrying and Love pytest
+-
+--------------------------------------------------------------------
+-Tue Dec  8 17:58:23 UTC 2020 - Matej Cepl <mcepl@suse.com>
+-
+-- Update to 0.37.1:
+-    - Remove support for CentOS 6 and Python 2.6 (remove 
+-      tests.vendor module). Python 2.7 is still fully supported.
+-    - Remodel CI:
+-      - on GitHub switched from Travis-CI to GH Actions
+-      - on GitLab-CI: stop testing 2.7 on Fedora, add centos7
+-      - update appveyor.yml
+-    - Stop playing with swig in setup.py, we don't support swig 1.* 
+-      anymore.
+-    - Fix dereferencing of pointers (gl#m2crypto/m2crypto#281)
+-    - Replace deprecated PyObject_AsReadBuffer with our own shim 
+-      (thanks to Casey Deccio for saving my bacon there).
+-    - Use parametrized to create parametrized tests (new external 
+-      dependency).
+-    - Only use DigestSign() and DigestUpdate() with OpenSSL >= 1.1.1
+-    - Expose all the X509_V_FLAG
+-    - Add support for DigestSign* and DigestVerify*
+-
+--------------------------------------------------------------------
+-Mon Jul 13 21:07:34 UTC 2020 - Matej Cepl <mcepl@suse.com>
+-
+-Update to 0.36.0:
+-    - wrap SocketIO in io.Buffered* for makefile <lethliel>
+-    - SSL.Connection.close accepts an argument to force the socket closing
+-      <Christophe Haen>
+-    - SSL.Connection: make the clientPostConnectionCheck an instance
+-      attribute <Christophe Haen>
+-    - Fixed bug with usage of unexisting method getreply at SSL_Transport
+-      <roman-nagaev>
+-    - Add appveyor builds for python 3.7 and 3.8 <Daniel A. Wozniak>
+-    - Fixed syntax warning on line 44. <randomfox>
+-    - Update M2Crypto.six to 1.13.0 <Matěj Cepl>
+-    - base64.decodestring() was finally removed in Python 3.8. <Matěj Cepl>
+-    - wrap SocketIO in io.Buffered* for makefile <lethliel>
+-    - NULL is legal argument for key and iv paramters of EVP_CipherInit(3)
+-      <Matěj Cepl>
+-    - Expose X509_V_FLAG_ALLOW_PROXY_CERTS verification flag and
+-      X509_STORE_SET_FLAGS function <Christophe Haen>
+-    - Stop testing for 2.6 and 3.4 on Travis. Start testing 3.8 <Matěj Cepl>
+-    - Extend test cert validity to 2049 <Bernhard M. Wiedemann>
+-    - Revert using typing module in 2.6. It is just not worthy. <Matěj Cepl>
+-    - Update Debian/stable SSL as well <Matěj Cepl>
+-    - Make tests pass again. <Matěj Cepl>
+-    - Stop using string module, which has been deprecated. <Matěj Cepl>
+-    - Tiny fixes to make pyls more happy <Matěj Cepl>
+-    - CI: Rework Fedora CI configuration <Neal Gompa> 
+-- Remove upstream merged patch 001-fix-buffering-for-python38.patch.
+-
+--------------------------------------------------------------------
+-Wed Apr  8 12:30:32 UTC 2020 - Tomáš Chvátal <tchvatal@suse.com>
+-
+-- Do not pull in py2 pkg on doc subpkg
+-
+--------------------------------------------------------------------
+-Mon Mar  9 09:56:49 UTC 2020 - Marco Strigl <marco.strigl@suse.com>
+-
+-- in python3.8 the fp is wrapped in a Buffer. SSL.Connection.makefile 
+-  returns a socketIO which is no buffer.
+-  Added: 001-fix-buffering-for-python38.patch 
+-
+--------------------------------------------------------------------
+-Mon Jun 10 13:59:24 CEST 2019 - Matej Cepl <mcepl@suse.com>
+-
+-- Update to fix release 0.35.2 ... just fixing the test suite
+-  (bsc#1172226).
+-
+--------------------------------------------------------------------
+-Sat Jun  8 08:58:56 CEST 2019 - Matej Cepl <mcepl@suse.com>
+-
+-- Replace fix_OpenSSL111c.patch with proper new release 0.35.1
+-  (there is really not much more in it; bsc#1149792).
+-
+--------------------------------------------------------------------
+-Fri Jun  7 22:21:23 CEST 2019 - Matej Cepl <mcepl@suse.com>
+-
+-- Add fix_OpenSSL111c.patch patch to ensure compatibility with
+-  OpenSSL 1.1.1c. gl#m2crypto/m2crypto#258 and jsc#SLE-9135.
+-
+--------------------------------------------------------------------
+-Thu Jun  6 12:27:35 UTC 2019 - Ondřej Súkup <mimi.vx@gmail.com>
+-
+-- Upgrade to 0.34.0
+-- no upstream changelog
+-
+--------------------------------------------------------------------
+-Fri Apr 26 16:48:44 CEST 2019 - Matej Cepl <mcepl@suse.com>
+-
+-- Upgrade to 0.33.0 (bsc#1135009):
+-  - eb4525c - Stop pretending to support Python 3.4.
+-  - 6a89548 - Fix use of urlunsplit (25 hours ago)
+-  - 0a5a356 - tests/test_ssl: use -ciphercuites for TLS1.3 cipher in
+-        openssl1.1
+-  - 8a0a3e3 - There are apparently multiword CPP variables. Taking that
+-        into account.
+-- Remove
+-  0001-tests-test_ssl-use-ciphercuites-for-TLS1.3-cipher-in.patch
+-  as it included in the latest release.
+-
+--------------------------------------------------------------------
+-Thu Mar  7 14:14:45 CET 2019 - Matej Cepl <mcepl@suse.com>
+-
+-- Fix for compatibility with OpenSSL 1.1.0h by adding the patch
+-  0001-tests-test_ssl-use-ciphercuites-for-TLS1.3-cipher-in.patch
+-
+--------------------------------------------------------------------
+-Tue Mar  5 09:01:46 CET 2019 - Matej Cepl <mcepl@suse.com>
+-
+-- Update to 0.32.0:
+-    * 471582f - setup.py: use ${CPP} as path to cpp <Duncan Macleod>
+-    * efb1580 - Bump pipeline OpenSSL from 1.1.0i to 1.1.0j 
+-    * 35bb71b - Stub wchar_t helpers and ignore unused WCHAR defs 
+-    * effc7be - Add type comment to setup.py  <Matěj Cepl>
+-
+--------------------------------------------------------------------
+-Wed Dec  5 14:30:23 UTC 2018 - Matej Cepl <mcepl@suse.com>
+-
+-- Whoops! Here -devel dependency certainly should stay
+-
+--------------------------------------------------------------------
+-Tue Dec  4 12:50:42 UTC 2018 - Matej Cepl <mcepl@suse.com>
+-
+-- Remove superfluous devel dependency for noarch package
+-
+--------------------------------------------------------------------
+-Fri Nov  9 15:20:09 CET 2018 - mcepl@suse.com
+-
+-- Update to 0.31.0 released tarball:
+-    * Compatibility with OpenSSL 1.1.1 (partly workaround, maybe
+-      requires further investigation)
+-    * Fixes for Windows builds
+-    * Fixes of installs on AWS Lambda
+-    * Fixes of Mac OS X related failures
+-    * Fix Python 2.6 compatibility issues
+-
+--------------------------------------------------------------------
+-Tue Nov  6 17:26:23 CET 2018 - mcepl@suse.com
+-
+-- pre-release of 0.31.0 tarball
+-- add openssl-1_1_1-compat.patch to fix OpenSSL 1.1.1 compatibility.
+-
+--------------------------------------------------------------------
+-Mon Sep 24 15:14:14 UTC 2018 - Matěj Cepl <mcepl@suse.com>
+-
+-- Update to 0.30.1:
+-    * Various small typos (Windows builds, Fix SSL.Connection.__del__)
+-    * The project is now Linux-distribution agnostic
+-    * Replace all old-style classes with the new ones (it shouldn't
+-      cause any problems, but feel free to file an issue, if it does)
+-    * Do not by-pass a potential transfer decoding in m2urllib2
+-    * Update M2Crypto.six with 1.11.0 and replace our local workarounds
+-      with new functions.
+-    * SSLv3 just removed.
+-    * Don't support Python 2.6 on Windows anymore. Windows users don't
+-      have python as a system package, so they are usually more likely
+-      to upgrade anyway.
+-
+--------------------------------------------------------------------
+-Fri Feb 23 17:38:27 UTC 2018 - michael@stroeder.com
+-
+-- Update to 0.29.0 (Fixes of some small bugs)
+-
+--------------------------------------------------------------------
+-Tue Feb 20 11:14:52 UTC 2018 - tchvatal@suse.com
+-
+-- Require python-xml that is used by some parts of M2crypto
++Fri May 27 13:57:30 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Disable tests on package building for Ubuntu 20.04 and higher
++- Disable tests using parameterized module to prevent extra dependency
++- Remove not required patches to disable rsa and ssl tests
++
++- Added:
++  * remove-parameterized-tests.patch
++
++- Removed:
++  * test_rsa.patch
++  * test_ssl.patch
++
++-------------------------------------------------------------------
++Fri May 27 13:42:11 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Update to 0.38.0
++
++- Added:
++  * M2Crypto-0.38.0.tar.gz
++  * M2Crypto-0.38.0.tar.gz.asc
++
++- Removed:
++  * M2Crypto-0.35.2.tar.gz
++  * PyObject_GC_UNTRACK_fix.patch
++  * test_x509_decodebytes_fix.patch
++
++-------------------------------------------------------------------
++Mon Apr  4 11:33:05 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
++- Skip tests on SLE12 due to fails on building against SLE12 GA
++
++-------------------------------------------------------------------
++Thu Feb  3 12:09:36 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Fixed test_rsa test
++- Fixed test_ssl test
++- Fixed test_x509 test by using decodebytes instead of decodestring
++  removed in Python 3.9
++- Make PyObject_GC_UNTRACK compatible with Python 3.9
++
++- Added:
++  * test_rsa.patch
++  * test_ssl.patch
++  * test_x509_decodebytes_fix.patch
++  * PyObject_GC_UNTRACK_fix.patch
++
++-------------------------------------------------------------------
++Thu Jan 20 11:05:35 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Require saltbundle-openssl-devel instead of openssl-devel
++  for building on SLE12 to prevent fails
++
++-------------------------------------------------------------------
++Thu May 28 17:12:02 UTC 2020 - Julio González Gil <jgonzalez@suse.com>
++
++- Add python3-M2crypto to LTSS channels, to allow using salt even
++  when the Server Applications Module is not used (bsc#1172226)
++
++-------------------------------------------------------------------
++Wed Sep 18 12:27:55 CEST 2019 - Matej Cepl <mcepl@suse.com>
++
++- bsc#1149792 jsc#SLE-9135 Update to 0.35.2, bugfixes only.
++  Changes cumulatively:
++    - fix compatibility with OpenSSL 1.1.1c. Thank you,
++      Sebastian Andrzej Siewior from the Debian team for resolving it.
++    - Stop pretending to support Python 3.4.
++    - The project is now Linux-distribution agnostic
++    - Replace all old-style classes with the new ones (it shouldn't cause
++      any problems, but feel free to file an issue, if it does)
++    - Do not by-pass a potential transfer decoding in m2urllib2
++    - SSLv3 just removed.
++    - Various fixes of the build system and internal errors.
++- Patch fix_urlunsplit.patch is removed, because it is included
++  in the upstream tarball.
++
++-------------------------------------------------------------------
++Tue May 28 15:40:56 CEST 2019 - Matej Cepl <mcepl@suse.com>
++
++- Fix use of urlunsplit (bsc#1135009)
+ 
+ -------------------------------------------------------------------
+ Fri Feb  9 22:30:59 UTC 2018 - michael@stroeder.com
+@@ -336,7 +194,7 @@
+ -------------------------------------------------------------------
+ Fri Jun  3 13:05:13 UTC 2016 - jweberhofer@weberhofer.at
+ 
+-- update to 0.24.0 (bsc#1001377)
++- update to 0.24.0
+   * No changelog provided
+ - README is no longer included
+ - Removed obsolete python-M2Crypto-SWIG-3.0.5.patch
+@@ -344,7 +202,7 @@
+ -------------------------------------------------------------------
+ Mon Dec  7 13:29:40 UTC 2015 - opensuse@dstoecker.de
+ 
+-- fix SSLv2 link error for 13.2 and Leap 42.1 (M2Crypto-0.22.5-SSLv2_link_error.patch) (bsc#969731)
++- fix SSLv2 link error for 13.2 and Leap 42.1 (M2Crypto-0.22.5-SSLv2_link_error.patch)
+ 
+ -------------------------------------------------------------------
+ Sat Dec  5 20:42:42 UTC 2015 - opensuse@dstoecker.de

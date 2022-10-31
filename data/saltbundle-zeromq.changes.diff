@@ -1,0 +1,19 @@
+--- zeromq.changes
++++ saltbundle-zeromq.changes
+@@ -1,3 +1,16 @@
++-------------------------------------------------------------------
++Fri Jun 17 06:59:23 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Disable automatic dependency processing to prevent redundant requires
++
++-------------------------------------------------------------------
++Thu Jan 20 07:25:31 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Remove baselibs.conf from the sources
++
++- Removed:
++  * baselibs.conf
++
+ -------------------------------------------------------------------
+ Fri Oct  2 13:50:26 UTC 2020 - Adam Majer <adam.majer@suse.de>
+ 

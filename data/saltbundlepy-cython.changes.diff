@@ -1,0 +1,79 @@
+--- python-Cython.changes
++++ saltbundlepy-cython.changes
+@@ -1,73 +1,7 @@
+ -------------------------------------------------------------------
+-Wed May 18 08:35:39 UTC 2022 - Paolo Stivanin <info@paolostivanin.com>
+-
+-- update to 0.29.30:
+-  * Avoid acquiring the GIL at the end of nogil functions. This change
+-    was backported in order to avoid generating wrong C code that
+-    would trigger C compiler warnings with tracing support enabled. 
+-  * Function definitions in finally: clauses were not correctly generated.
+-  * A case where C-API functions could be called with a live exception
+-    set was fixed.
+-  * Cython now correctly generates Python methods for both the provided
+-    regular and reversed special numeric methods of extension types.
+-  * The C union type in pure Python mode mishandled some field names.
+-
+--------------------------------------------------------------------
+-Sun Mar 20 20:33:02 UTC 2022 - Dirk Müller <dmueller@suse.com>
+-
+-- update to 0.29.28:
+-  * Due to backwards incompatible changes in CPython 3.11a4, the feature flags
+-    ``CYTHON_FAST_THREAD_STATE`` and ``CYTHON_USE_EXC_INFO_STACK`` are now disabled
+-    in Python 3.11 and later.  They are enabled again in Cython 3.0.
+-    Patch by David Woods.  (Github issue #4610)
+-  * A C compiler warning in older PyPy versions was resolved.
+-    Patch by Matti Picus.  (Github issue #4236)
+-
+--------------------------------------------------------------------
+-Wed Feb  2 17:54:50 UTC 2022 - Matej Cepl <mcepl@suse.com>
+-
+-- Make the running the test suite conditional (default
+-  off). Seven hours of running it is just too much.
+-
+--------------------------------------------------------------------
+-Mon Jan 31 20:31:01 UTC 2022 - Matej Cepl <mcepl@suse.com>
+-
+-- Enable running of the test suite.
+-
+--------------------------------------------------------------------
+-Mon Jan 31 13:46:21 UTC 2022 - Paolo Stivanin <info@paolostivanin.com>
+-
+-- update to 0.29.27:
+-  * The ``cythonize`` command has a new option ``-M`` to generate ``.dep`` dependency
+-    files for the compilation unit.  This can be used by external build tools to track
+-    these dependencies.
+-  * Calls to ``range()`` with more than three arguments did not fail.
+-  * Some C compiler warnings about missing type struct initialisers in Py3.10 were resolved.
+-  * Cython no longer warns about using OpenMP 3.0 features since they are now
+-    considered generally available.
+-
+--------------------------------------------------------------------
+-Tue Jan  4 15:59:48 UTC 2022 - Dirk Müller <dmueller@suse.com>
+-
+-- update to 0.29.26:
+-  * An incompatibility with CPython 3.11.0a3 was resolved.
+-  * The ``in`` operator failed on literal lists with starred
+-    expressions.
+-  * A C compiler warning in PyPy about a missing struct field
+-    initialisation was resolved.
+-
+--------------------------------------------------------------------
+-Mon Dec  6 20:16:04 UTC 2021 - Dirk Müller <dmueller@suse.com>
+-
+-- update to 0.29.25:
+-  * Several incompatibilities with CPython 3.11 were resolved.
+-  * Some C compiler warnings were resolved.
+-  * C++ ``std::move()`` should only be used automatically in MSVC versions that support it.
+-  * The ``Py_hash_t`` type failed to accept arbitrary "index" values.
+-  * Avoid copying unaligned 16-bit values since some platforms require them to be aligned.
+-    Use memcpy() instead to let the C compiler decide how to do it.
+-  * Cython crashed on invalid truthiness tests on C++ types without ``operator bool``.
+-  * The declaration of ``PyUnicode_CompareWithASCIIString()`` in ``cpython.unicode`` was incorrect.
++Mon Apr  4 12:33:46 UTC 2022 - Victor Zhestkov <victor.zhestkov@suse.com>
++
++- Strictly require Python 3.10 with saltbundlepy requrement
+ 
+ -------------------------------------------------------------------
+ Wed Jul 14 08:28:08 UTC 2021 - Paolo Stivanin <info@paolostivanin.com>

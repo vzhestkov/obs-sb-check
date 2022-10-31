@@ -1,0 +1,64 @@
+--- python-websocket-client.spec
++++ saltbundlepy-websocket-client.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-websocket-client
++# spec file for package saltbundlepy-websocket-client
+ #
+-# Copyright (c) 2020 SUSE LLC
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -17,36 +17,30 @@
+ 
+ 
+ %{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-# RHEL provides this backport in its own repository
+-%if 0%{?rhel} == 7
+-%define ssl_match_hostname python-backports-ssl_match_hostname
+-%else
+-%define ssl_match_hostname python-backports.ssl_match_hostname
+-%endif
+-%bcond_without python2
+-Name:           python-websocket-client
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-websocket-client
+ Version:        0.57.0
+ Release:        0
+ Summary:        WebSocket client implementation
+ License:        LGPL-2.1-only
++Group:          Development/Languages/Python
+ URL:            https://github.com/liris/websocket-client/releases
+ Source0:        https://files.pythonhosted.org/packages/source/w/websocket_client/websocket_client-%{version}.tar.gz
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  %{python_module six}
++BuildRequires:  %{saltbundlepy_module base > 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  %{saltbundlepy_module six}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-Requires:       python-six
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-six
+ Requires(post): update-alternatives
+-Requires(postun): update-alternatives
+-Provides:       python-websocket-client-test = %{version}
+-Obsoletes:      python-websocket-client-test < %{version}
++Requires(postun):update-alternatives
+ BuildArch:      noarch
+-%if %{with python2}
+-BuildRequires:  %{ssl_match_hostname}
+-%endif
+-%ifpython2
+-Requires:       %{ssl_match_hostname}
+-%endif
+ %python_subpackages
+ 
+ %description

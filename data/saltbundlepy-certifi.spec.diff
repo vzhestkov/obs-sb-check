@@ -1,0 +1,103 @@
+--- python-certifi.spec
++++ saltbundlepy-certifi.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-certifi
++# spec file for package saltbundlepy-certifi
+ #
+-# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,28 +12,35 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-certifi
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-certifi
+ Version:        2018.1.18
+ Release:        0
+ Summary:        Python package for providing Mozilla's CA Bundle
+ License:        MPL-2.0
+ Group:          Development/Languages/Python
+-Url:            https://pypi.python.org/pypi/certifi
++URL:            https://pypi.python.org/pypi/certifi
+ Source:         https://files.pythonhosted.org/packages/source/c/certifi/certifi-%{version}.tar.gz
+ # PATCH-FIX-SUSE -- prefer SUSE certificates
+-Patch0:         python-certifi-shipped-requests-cabundle.patch
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
++Patch0:         return-CA-bundle-for-distro.patch
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  ca-certificates
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ Requires:       ca-certificates
+ Requires:       ca-certificates-mozilla
++Requires:       saltbundlepy-base
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+ BuildArch:      noarch
+ %python_subpackages
+@@ -48,6 +55,20 @@
+ %prep
+ %setup -q -n certifi-%{version}
+ %patch0 -p1
++%if 0%{?suse_version}
++export CA_BUNDLE_PATH=/etc/ssl/ca-bundle.pem
++%endif
++%if 0%{?rhel_version} || 0%{?centos_version} || 0%{?fedora_version} || 0%{?almalinux_version} || 0%{?rocky_version}
++export CA_BUNDLE_PATH=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
++%endif
++%if 0%{?debian_version} || 0%{?ubuntu_version}
++export CA_BUNDLE_PATH=/etc/ssl/certs/ca-certificates.crt
++%endif
++if [ -z "${CA_BUNDLE_PATH}" ]; then
++    echo "Error: Unable to define CA bundle path!"
++    exit 1
++fi
++sed -i "s#++CA_BUNDLE_PATH++#${CA_BUNDLE_PATH}#" certifi/core.py
+ 
+ %build
+ %python_build
+@@ -56,20 +77,13 @@
+ %python_install
+ 
+ %{python_expand chmod +x %{buildroot}%{$python_sitelib}/certifi/core.py
+- sed -i "s|#!/usr/bin/env python|#!%__$python|" %{buildroot}/%{$python_sitelib}/certifi/core.py
++ sed -i "s|#!/usr/bin/env python|#!%{__$python}|" %{buildroot}/%{$python_sitelib}/certifi/core.py
+  rm %{buildroot}%{$python_sitelib}/certifi/cacert.pem
++ find %{buildroot}%{$python_sitelib} -name '*.pyc' -delete
++ %{__$python} -m compileall -d %{$python_sitelib} %{buildroot}%{$python_sitelib}
++ %{__$python} -O -m compileall -d %{$python_sitelib} %{buildroot}%{$python_sitelib}
++ %fdupes %{buildroot}%{$python_sitelib}
+ }
+-
+-%if 0%{?have_python2}
+-%py_compile %{buildroot}%{python2_sitelib}/certifi/
+-%py_compile -O %{buildroot}%{python2_sitelib}/certifi/
+-%endif
+-%if 0%{?have_python3}
+-%py3_compile %{buildroot}%{python3_sitelib}/certifi/
+-%py3_compile -O %{buildroot}%{python3_sitelib}/certifi/
+-%endif
+-
+-%python_expand %fdupes %{buildroot}%{$python_sitelib}
+ 
+ %files %{python_files}
+ %defattr(-,root,root,-)

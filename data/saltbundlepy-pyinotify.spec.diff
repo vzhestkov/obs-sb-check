@@ -1,0 +1,85 @@
+--- python-pyinotify.spec
++++ saltbundlepy-pyinotify.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-pyinotify
++# spec file for package saltbundlepy-pyinotify
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,24 +12,30 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-pyinotify
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-pyinotify
+ Version:        0.9.6
+ Release:        0
+ Summary:        Python module for watching filesystems changes
+ License:        MIT
+ Group:          Development/Libraries/Python
+-Url:            http://github.com/seb-m/pyinotify
++URL:            http://github.com/seb-m/pyinotify
+ Source:         https://files.pythonhosted.org/packages/source/p/pyinotify/pyinotify-%{version}.tar.gz
+-Source1:        pyinotify
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  python-rpm-macros
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildArch:      noarch
++Requires:       saltbundlepy-base
+ Requires(post):   update-alternatives
+ Requires(postun):  update-alternatives
+ %python_subpackages
+@@ -52,32 +58,18 @@
+ 
+ %prep
+ %setup -q -n pyinotify-%{version}
+-# remove unwanted shebang
+-sed -i '/^#!/ d' python2/pyinotify.py
+-sed -i "s|#!/usr/bin/env python|#!%__python2|" python2/examples/*py
+-sed -i "s|#!/usr/bin/env python|#!%__python3|" python3/examples/*py
++sed -i '/^#!/ d' python3/pyinotify.py
+ 
+ %build
+ %python_build
+ 
+ %install
+ %python_install
+-install -D -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/pyinotify
+-%python_clone -a %{buildroot}%{_bindir}/pyinotify
+-
+-%post
+-%python_install_alternative pyinotify
+-
+-%postun
+-%python_uninstall_alternative pyinotify
+ 
+ %files %{python_files}
+ %defattr(-,root,root)
+ %doc ACKS COPYING README.md
+ %doc old/ChangeLog old/NEWS
+-%python2_only %doc python2/examples
+-%python3_only %doc python3/examples
+-%python_alternative %{_bindir}/pyinotify
+ %{python_sitelib}/*
+ 
+ %changelog

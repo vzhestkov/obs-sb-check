@@ -1,0 +1,78 @@
+--- python-psutil.spec
++++ saltbundlepy-psutil.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-psutil
++# spec file for package saltbundlepy-psutil
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,14 +16,20 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
+ %ifarch x86_64 %{ix86}
+ %bcond_without  test
+ %else
+ %bcond_with     test
+ %endif
+-%bcond_without python2
+-Name:           python-psutil
++
++Name:           saltbundlepy-psutil
+ Version:        5.8.0
+ Release:        0
+ Summary:        A process utilities module for Python
+@@ -36,25 +42,19 @@
+ Patch2:         skip_failing_tests.patch
+ # PATCH-FIX-SLE skip_rlimit_tests_on_python2.patch alarrosa@suse.com
+ Patch3:         skip_rlimit_tests_on_python2.patch
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
++# Skip test_method_2 also as faling in OBS
++Patch4:         skip-obs-test_method_2.patch
++# Skip tests.test_contracts.TestFetchAllProcesses.test_all randomly failing in OBS
++Patch5:         skip-obs-test_contracts-TestFetchAllProcesses.test_all.patch
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ Requires:       net-tools
+ Requires:       procps
+ %if %{with test}
+-%if 0%{suse_version} < 1550
+-BuildRequires:  %{python_module unittest2}
+-%endif
+ BuildRequires:  net-tools
+ BuildRequires:  procps
+-%if %{with python2}
+-BuildRequires:  python-ipaddress
+-BuildRequires:  python-mock
+-%endif
+-%endif
+-%ifpython2
+-Requires:       python-ipaddress
+ %endif
+ %python_subpackages
+ 
+@@ -87,10 +87,9 @@
+ export LANG=en_US.UTF-8
+ export PSUTIL_TESTING=1
+ export TRAVIS=1
+-march=`python3 -c "import platform ; print(platform.machine())"`
+ 
+ # Note test_fetch_all is a bit flaky, occasionally failing
+-%python_expand PYTHONPATH=build/lib.linux-${march}-%{$python_version}/ $python -Wa psutil/tests/runner.py
++%python_expand march=`$python -c "import platform ; print(platform.machine())"` PYTHONPATH=build/lib.linux-${march}-%{$python_version}/ $python -Wa psutil/tests/runner.py
+ %endif
+ 
+ %files %{python_files}

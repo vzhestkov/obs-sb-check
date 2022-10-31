@@ -1,0 +1,62 @@
+--- python-PyYAML.spec
++++ saltbundlepy-pyyaml.spec
+@@ -1,5 +1,5 @@
+ #
+-# spec file for package python-PyYAML
++# spec file for package saltbundlepy-pyyaml
+ #
+ # Copyright (c) 2021 SUSE LLC
+ #
+@@ -16,25 +16,29 @@
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%define oldpython python
+-Name:           python-PyYAML
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++%global debug_package %{nil}
++
++Name:           saltbundlepy-pyyaml
+ Version:        5.4.1
+ Release:        0
+ Summary:        YAML parser and emitter for Python
+ License:        MIT
+ URL:            https://github.com/yaml/pyyaml
+ Source:         https://files.pythonhosted.org/packages/source/P/PyYAML/PyYAML-%{version}.tar.gz
+-BuildRequires:  %{python_module Cython}
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module base >= 3.10}
++BuildRequires:  %{saltbundlepy_module cython}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+ BuildRequires:  libyaml-devel
+-BuildRequires:  python-rpm-macros
+-%ifpython2
+-# python-yaml was last used in openSUSE 12.1.
+-Provides:       %{oldpython}-yaml = %{version}
+-Obsoletes:      %{oldpython}-yaml < %{version}
+-%endif
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-base
+ 
+ %description
+ YAML is a data serialization format designed for human readability
+@@ -70,6 +74,11 @@
+ %ifarch ppc ppc64 s390 s390x
+ ulimit -Sn 2048
+ %endif
++%if 0%{?debian} == 10
++# 4 tests are failing while using libyaml on Debian 10 based distros
++# remove these files to prevent it
++rm -r tests/data/spec-07-09.* tests/data/spec-07-10.* tests/data/spec-07-13.* tests/data/spec-08-08.*
++%endif
+ %python_exec setup.py test
+ 
+ %files %{python_files}

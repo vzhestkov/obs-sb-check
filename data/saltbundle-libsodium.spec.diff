@@ -1,0 +1,106 @@
+--- libsodium.spec
++++ saltbundle-libsodium.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package libsodium
++# spec file for package saltbundle-libsodium
+ #
+-# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,24 +12,29 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+ %define sover   23
+-%define lname   %{name}%{sover}
+-Name:           libsodium
++%define lname   %{name}
++%define lib_name libsodium
++Name:           saltbundle-libsodium
+ Version:        1.0.16
+ Release:        0
+ Summary:        Portable NaCl-based crypto library
+ License:        ISC
+ Group:          System/Libraries
+ URL:            https://github.com/jedisct1/libsodium
+-Source0:        https://github.com/jedisct1/libsodium/releases/download/%{version}/%{name}-%{version}.tar.gz
+-Source1:        https://github.com/jedisct1/libsodium/releases/download/%{version}/%{name}-%{version}.tar.gz.sig
+-Source2:        %{name}.keyring
+-Source99:       baselibs.conf
++Source0:        libsodium-%{version}.tar.gz
++Source1:        libsodium-%{version}.tar.gz.sig
++Source2:        libsodium.keyring
++Source1000:     saltbundle-libsodium-rpmlintrc
+ BuildRequires:  pkgconfig
++%if "%_vendor" == "debbuild"
++BuildRequires:  debbuild
++%endif
++AutoReqProv:    0
+ 
+ %description
+ NaCl (pronounced "salt") is a new easy-to-use high-speed software library
+@@ -39,34 +44,26 @@
+ Sodium is a portable, cross-compilable, installable, packageable fork of NaCl,
+ with a compatible API.
+ 
+-%package -n  %{lname}
+-Summary:        Portable NaCl-based crypto library
+-Group:          System/Libraries
+-
+-%description -n %{lname}
+-NaCl (pronounced "salt") is a new easy-to-use high-speed software library
+-for network communication, encryption, decryption, signatures, etc. NaCl's goal
+-is to provide all of the core operations needed to build higher-level cryptographic tools.
+-
+-Sodium is a portable, cross-compilable, installable, packageable fork of NaCl,
+-with a compatible API.
+-
+ %package devel
+ Summary:        Portable NaCl-based crypto library
+ Group:          Development/Libraries/C and C++
+ Requires:       %{lname} = %{version}
++AutoReqProv:    0
+ 
+ %description devel
+ This package contains all necessary include files and libraries needed
+ to compile and develop applications that use libsodium.
+ 
+ %prep
+-%setup -q
++%setup -q -n libsodium-%{version}
+ 
+ %build
+ # Do _NOT_ change CFLAGS
+ # See https://github.com/jedisct1/libsodium/issues/604
+ %configure \
++%if 0%{?is_opensuse} && "%{_arch}" == "aarch64"
++  --disable-asm \
++%endif
+   --disable-static \
+   --disable-silent-rules
+ make %{?_smp_mflags}
+@@ -83,13 +80,13 @@
+ 
+ %files -n %{lname}
+ %license LICENSE
+-%{_libdir}/%{name}.so.%{sover}*
++%{_libdir}/%{lib_name}.so.%{sover}*
+ 
+ %files devel
+ %doc AUTHORS ChangeLog README.markdown THANKS
+ %{_includedir}/sodium.h
+ %{_includedir}/sodium
+-%{_libdir}/%{name}.so
+-%{_libdir}/pkgconfig/%{name}.pc
++%{_libdir}/%{lib_name}.so
++%{_libdir}/pkgconfig/%{lib_name}.pc
+ 
+ %changelog

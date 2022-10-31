@@ -1,0 +1,84 @@
+--- python-MarkupSafe.spec
++++ saltbundlepy-markupsafe.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-MarkupSafe
++# spec file for package saltbundlepy-markupsafe
+ #
+-# Copyright (c) 2022 SUSE LLC
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -16,30 +16,26 @@
+ #
+ 
+ 
+-%define oldpython python
+-%define skip_python2 1
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-%bcond_without test
+-Name:           python-MarkupSafe
+-Version:        2.1.1
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-markupsafe
++Version:        2.0.1
+ Release:        0
++URL:            http://dev.pocoo.org/
+ Summary:        Implements a XML/HTML/XHTML Markup safe string for Python
+ License:        BSD-3-Clause
+ Group:          Development/Languages/Python
+-URL:            https://github.com/pallets/markupsafe
+ Source:         https://files.pythonhosted.org/packages/source/M/MarkupSafe/MarkupSafe-%{version}.tar.gz
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
+-BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
+-Requires:       python-base >= 3.6
+-%if %{with test}
+-BuildRequires:  %{python_module pytest}
+-%endif
+-%ifpython2
+-Provides:       %{oldpython}-markupsafe = %{version}
+-Obsoletes:      %{oldpython}-markupsafe < %{version}
+-%endif
++BuildRoot:      %{_tmppath}/%{name}-%{version}-build
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
++BuildRequires:  saltbundlepy-rpm-macros
++Requires:       saltbundlepy-base
+ %python_subpackages
+ 
+ %description
+@@ -55,21 +51,15 @@
+ 
+ %install
+ %python_install
+-%python_expand %fdupes %{buildroot}%{$python_sitearch}
+ %python_expand rm %{buildroot}%{$python_sitearch}/markupsafe/_speedups.c
+-# Upstream changed the Python package metadata to require Python 3.7, but the tests pass on Python 3.6.
+-%if %python_version_nodots == 36
+-%python_expand sed 's/Requires-Python: >=3.7/Requires-Python: >=3.6/' -i %{buildroot}%{python_sitearch}/MarkupSafe-%{version}-py3.6.egg-info/PKG-INFO
+-%endif
+ 
+-%if %{with test}
+ %check
+-%pytest_arch
+-%endif
++%python_exec setup.py test
+ 
+-%files %{python_files}
++%files %python_files
++%defattr(-,root,root,-)
+ %license LICENSE.rst
+-%doc README.rst docs/
++%doc README.rst
+ %{python_sitearch}/markupsafe/
+ %{python_sitearch}/MarkupSafe-%{version}-py*.egg-info
+ 

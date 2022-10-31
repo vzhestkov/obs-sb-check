@@ -1,0 +1,59 @@
+--- python-ptyprocess.spec
++++ saltbundlepy-ptyprocess.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-ptyprocess
++# spec file for package saltbundlepy-ptyprocess
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,30 +12,37 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%bcond_without tests
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-Name:           python-ptyprocess
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++%bcond_with     tests
++
++Name:           saltbundlepy-ptyprocess
+ Version:        0.5.2
+ Release:        0
+ Summary:        Run a subprocess in a pseudo terminal
+ License:        ISC
+ Group:          Development/Languages/Python
+-Url:            https://github.com/pexpect/ptyprocess
++URL:            https://github.com/pexpect/ptyprocess
+ Source:         https://files.pythonhosted.org/packages/source/p/ptyprocess/ptyprocess-%{version}.tar.gz
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ %if %{with tests}
+-BuildRequires:  %{python_module nose}
++BuildRequires:  %{saltbundlepy_module nose}
+ %endif
+ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+ BuildArch:      noarch
++Requires:       saltbundlepy-base
+ %python_subpackages
+ 
+ %description

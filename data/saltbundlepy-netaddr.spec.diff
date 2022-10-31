@@ -1,0 +1,68 @@
+--- python-netaddr.spec
++++ saltbundlepy-netaddr.spec
+@@ -1,7 +1,7 @@
+ #
+-# spec file for package python-netaddr
++# spec file for package saltbundlepy-netaddr
+ #
+-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
++# Copyright (c) 2021 SUSE LLC
+ #
+ # All modifications and additions to the file contributed by third parties
+ # remain the property of their copyright owners, unless otherwise agreed
+@@ -12,24 +12,29 @@
+ # license that conforms to the Open Source Definition (Version 1.9)
+ # published by the Open Source Initiative.
+ 
+-# Please submit bugfixes or comments via http://bugs.opensuse.org/
++# Please submit bugfixes or comments via https://bugs.opensuse.org/
+ #
+ 
+ 
+-%{?!python_module:%define python_module() python-%{**} python3-%{**}}
+-#%%bcond_without test
+-Name:           python-netaddr
++%{?!saltbundlepy_module:%define saltbundlepy_module() saltbundlepy-%{**}}
++%define pythons saltbundlepy
++
++# Disable python bytecompile for all distros
++# It's called explicitly in the spec
++%global __brp_python_bytecompile %{nil}
++
++Name:           saltbundlepy-netaddr
+ Version:        0.7.19
+ Release:        0
+ Summary:        Pythonic manipulation of IPv4, IPv6, CIDR, EUI and MAC network addresses
+ License:        BSD-3-Clause
+ Group:          Development/Languages/Python
+-Url:            http://github.com/drkjam/netaddr
++URL:            http://github.com/drkjam/netaddr
+ Source:         https://files.pythonhosted.org/packages/source/n/netaddr/netaddr-%{version}.tar.gz
+-BuildRequires:  %{python_module devel}
+-BuildRequires:  %{python_module setuptools}
++BuildRequires:  %{saltbundlepy_module devel >= 3.10}
++BuildRequires:  %{saltbundlepy_module setuptools}
+ BuildRequires:  fdupes
+-BuildRequires:  python-rpm-macros
++BuildRequires:  saltbundlepy-rpm-macros
+ BuildArch:      noarch
+ %python_subpackages
+ 
+@@ -59,7 +64,7 @@
+ 
+ %install
+ %python_install
+-%python_clone %{buildroot}%{_bindir}/netaddr
++rm %{buildroot}%{_bindir}/netaddr
+ %fdupes %{buildroot}
+ 
+ %if %{with test}
+@@ -69,8 +74,6 @@
+ 
+ %files %{python_files}
+ %{python_sitelib}/*
+-%{_bindir}/netaddr-%{python_bin_suffix}
+-%python3_only %{_bindir}/netaddr
+ %doc AUTHORS CHANGELOG COPYRIGHT README.md LICENSE
+ 
+ %changelog
